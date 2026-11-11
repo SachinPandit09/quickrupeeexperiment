@@ -2,619 +2,877 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dark Side of Fintech — Research Study</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Loaded without blocking first paint; text shows in the system font until it arrives (display=swap). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&display=swap" media="print" onload="this.media='all'">
 <style>
-:root{--purple:#673AB7;--purple-dark:#512DA8;--purple-light:#EDE7F6;--text:#1a1a1a;--muted:#555;--border:#dadce0;--bg:#f0ebf8;--card:#fff;--red:#d93025;--green:#1e8e3e}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:0;min-height:100vh}
-.container{max-width:680px;margin:0 auto;padding:32px 16px 60px}
+:root{
+  --ink:#1E2B2F; --muted:#4F5F64; --paper:#F3F6F5; --sheet:#FFFFFF;
+  --line:#DCE3E1; --control:#74858A; --accent:#1D5C63; --accent-soft:#E2EEEE;
+  --error:#B42318; --error-soft:#FDF1EF;
+  /* Latin glyphs use system fonts (no swap, no layout shift); Devanagari glyphs fall through to Noto. */
+  /* Named fonts only: system-ui/-apple-system would use the OS Devanagari fallback and never reach Noto. */
+  --font:'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans Devanagari','Nirmala UI','Kohinoor Devanagari','Mangal',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font);font-size:16px;line-height:1.6;color:var(--ink);background:var(--paper);min-height:100vh;overflow-wrap:break-word}
+button,input{font:inherit;color:inherit}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+[hidden]{display:none!important}
+
+/* Top bar */
+.topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;max-width:680px;margin:0 auto;padding:12px 16px}
+.brand{font-size:14px;font-weight:600;color:var(--muted)}
+.lang{display:flex;border:1.5px solid var(--control);border-radius:10px;overflow:hidden;background:var(--sheet)}
+.lang button{min-height:44px;min-width:56px;padding:0 14px;border:0;background:transparent;font-size:15px;line-height:1.3;cursor:pointer}
+.lang button+button{border-left:1px solid var(--control)}
+.lang button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:600}
+
+/* Progress */
+.progress{max-width:680px;margin:0 auto;padding:0 16px 8px}
+.progress-text{font-size:14px;color:var(--muted);margin-bottom:6px}
+.track{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.fill{height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0);transition:transform .3s}
+
+main{max-width:680px;margin:0 auto;padding:8px 16px 48px}
 .screen{display:none}.screen.active{display:block}
-.header-card{background:var(--card);border-radius:12px;overflow:hidden;margin-bottom:20px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.header-banner{height:12px;background:linear-gradient(135deg,var(--purple),var(--purple-dark))}
-.header-content{padding:28px 28px 24px}
-.header-content h1{font-family:'Instrument Serif',serif;font-size:30px;font-weight:400;line-height:1.25;margin-bottom:12px}
-.header-content p{font-size:14px;color:var(--muted);line-height:1.7}
-.req-note{font-size:13px;color:var(--red);margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
-.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.q-label{font-size:15px;font-weight:500;margin-bottom:16px;line-height:1.55}
-.q-label .req{color:var(--red);margin-left:2px}
-.options{display:flex;flex-direction:column;gap:2px}
-.option{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text);padding:8px 4px;border-radius:8px;cursor:pointer;transition:background .15s}
-.option:hover{background:#f8f5ff}
-.option input[type=radio]{width:20px;height:20px;accent-color:var(--purple);cursor:pointer;flex-shrink:0}
-.option .other-field{border:none;border-bottom:1.5px solid var(--border);padding:4px 0;font-size:14px;font-family:'DM Sans',sans-serif;width:160px;background:transparent;color:var(--text);outline:none}
-.option .other-field:focus{border-color:var(--purple)}
-.option .other-field:disabled{opacity:.4}
-.likert{display:flex;align-items:center;gap:10px}
-.likert-end{font-size:12px;color:var(--muted);flex-shrink:0;width:80px;text-align:center;line-height:1.3}
-.likert-opts{display:flex;justify-content:space-around;flex:1;gap:4px}
-.likert-opts label{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 4px;border-radius:8px;transition:background .15s;flex:1}
-.likert-opts label:hover{background:#f8f5ff}
-.likert-opts input[type=radio]{width:22px;height:22px;accent-color:var(--purple);cursor:pointer}
-.likert-opts span{font-size:13px;color:var(--muted);font-weight:500}
-.section-bar{background:var(--purple);color:#fff;padding:14px 28px;border-radius:12px 12px 0 0;font-size:16px;font-weight:600;margin-top:28px}
-.section-desc{background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:18px 28px;margin-bottom:16px;font-size:14px;color:var(--muted);font-style:italic;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
-.btn{padding:10px 28px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:opacity .15s}
-.btn-primary{background:var(--purple);color:#fff}.btn-primary:hover{opacity:.9}.btn-primary:disabled{opacity:.5;cursor:default}
-.btn-outline{background:transparent;color:var(--purple);border:1px solid var(--border)}
-.scenario-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:32px 28px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.scenario-card h2{font-size:18px;font-weight:700;margin-bottom:16px}
-.scenario-card p{font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:12px}
-.scenario-card .checklist{list-style:none;padding:0;margin:16px 0}
-.scenario-card .checklist li{font-size:14px;padding:5px 0;display:flex;align-items:center;gap:10px}
-.scenario-card .checklist li::before{content:"✅";font-size:15px}
-.important{font-weight:700;font-size:14px;margin:12px 0 6px}
-.iframe-wrap{display:flex;justify-content:center;padding:10px 0}
-.iframe-wrap iframe{border:none;width:100%;max-width:460px;transition:height 0.15s ease}
-.loader-box{text-align:center;padding:80px 20px}
-.spin{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:16px}
+h1{font-size:26px;line-height:1.35;font-weight:600;margin-bottom:12px}
+h2{font-size:20px;line-height:1.4;font-weight:600;margin-bottom:10px}
+h1:focus,h2:focus{outline:none}
+.lede,.sheet p{color:var(--muted)}
+.sheet p+p{margin-top:10px}
+.req-note{font-size:14px;margin-top:14px}
+.req{color:var(--error);margin-left:3px}
+.strong{color:var(--ink)!important;font-weight:600}
+.checklist{margin:8px 0 4px 1.2em;color:var(--ink)}
+.checklist li{padding:2px 0}
+.scale-key{list-style:none;margin-top:10px;color:var(--ink);font-size:15px}
+
+/* Questions */
+.q{border:0;padding:20px 0;border-top:1px solid var(--line);min-width:0}
+.sheet>.q:first-child{border-top:0;padding-top:0}
+.q:last-child{padding-bottom:0}
+.q-label{float:left;width:100%;font-size:17px;font-weight:600;line-height:1.5;margin-bottom:12px;padding:0}
+.q-label+*{clear:both}
+.options{display:flex;flex-direction:column;gap:4px}
+.option{display:flex;align-items:center;gap:12px;min-height:44px;padding:8px 10px;border-radius:10px;cursor:pointer;line-height:1.45}
+.option:hover{background:var(--paper)}
+.option:has(input:checked){background:var(--accent-soft)}
+.option input{width:20px;height:20px;flex-shrink:0;accent-color:var(--accent);cursor:pointer}
+.option input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.other-field{display:block;width:100%;min-height:44px;margin:4px 0 0;padding:8px 12px;border:1.5px solid var(--control);border-radius:10px;background:var(--sheet)}
+.other-field:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+
+/* Likert: one horizontal ruler, identical at every width. 1 = strongly disagree on the left. */
+.scale{display:grid;grid-template-columns:repeat(5,minmax(44px,1fr));max-width:420px;border:1.5px solid var(--control);border-radius:12px;overflow:hidden;background:var(--sheet)}
+.pt{position:relative;display:flex;align-items:center;justify-content:center;min-height:52px;cursor:pointer}
+.pt+.pt{border-left:1px solid var(--control)}
+.pt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.pt-n{font-size:18px;font-weight:600;line-height:1;pointer-events:none}
+.pt:hover{background:var(--paper)}
+.pt:has(input:checked){background:var(--accent);color:#fff}
+.pt:has(input:focus-visible){outline:3px solid var(--ink);outline-offset:-5px}
+.anchors{display:flex;justify-content:space-between;gap:12px;max-width:420px;margin-top:8px;font-size:14px;line-height:1.45;color:var(--muted)}
+.anchors span{max-width:48%}
+.anchors span+span{text-align:right}
+.picked{min-height:1.6em;margin-top:6px;font-size:15px;color:var(--muted)}
+.picked.on{color:var(--ink);font-weight:600}
+
+/* Errors */
+.error-msg{margin-top:8px;font-size:15px;font-weight:600;color:var(--error)}
+.q.error{background:var(--error-soft);margin:0 -12px;padding-left:12px;padding-right:12px;border-radius:10px}
+
+/* Actions */
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}
+.btn{min-height:48px;padding:10px 24px;border-radius:10px;font-size:16px;font-weight:600;line-height:1.3;cursor:pointer;border:1.5px solid transparent}
+.btn.primary{background:var(--accent);color:#fff;margin-left:auto}
+.btn.primary:hover{background:#174C52}
+.btn.ghost{background:transparent;border-color:var(--control)}
+.btn:focus-visible,.lang button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+/* Loan interface */
+.frame-wrap iframe{display:block;width:100%;max-width:460px;height:900px;margin:0 auto;border:0}
+
+/* Status screens */
+.status{text-align:center;padding:56px 8px}
+.status h1,.status h2{margin-bottom:10px}
+.status p{color:var(--muted)}
+.spin{width:40px;height:40px;margin:0 auto 16px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loader-text{font-size:14px;color:var(--muted)}
-.thankyou-box{text-align:center;padding:60px 20px}
-.thankyou-box .icon{font-size:56px;margin-bottom:16px}
-.thankyou-box h2{font-size:22px;font-weight:700;margin-bottom:10px}
-.thankyou-box p{font-size:14px;color:var(--muted);line-height:1.7}
-.q-card.error{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
-.error-msg{font-size:12px;color:var(--red);margin-top:6px;display:none}
-.q-card.error .error-msg{display:block}
-.step-info{text-align:center;font-size:12px;color:var(--muted);margin-bottom:16px}
-@media(max-width:500px){.container{padding:12px 8px 32px}.header-content{padding:20px 16px}.q-card{padding:18px 16px}.header-content h1{font-size:24px}.iframe-wrap{padding:0}.iframe-wrap iframe{max-width:100%;border-radius:0}.scenario-card{padding:24px 16px}.btn-row{margin-top:14px}.option{padding:10px 4px;gap:10px;font-size:15px}.option input[type=radio]{width:22px;height:22px}.btn{padding:12px 28px;font-size:15px;min-height:46px}.q-label{font-size:15px;margin-bottom:14px}.likert{flex-direction:column;gap:8px}.likert-end{width:auto;font-size:12px;font-weight:600}.likert-opts{width:100%;gap:2px}.likert-opts label{padding:8px 2px}.likert-opts input[type=radio]{width:24px;height:24px}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}.fill{transition:none}}
+
+@media (max-width:480px){
+  .sheet{padding:20px 16px;border-radius:12px}
+  h1{font-size:22px}
+  .q-label{font-size:16px}
+  .q.error{margin:0 -8px;padding-left:8px;padding-right:8px}
+  .btn{padding:10px 18px}
+  .frame-wrap{margin:0 -16px}
+}
 </style>
+<script id="i18n" type="application/json">
+{
+"en": {
+  "lang.name": "English",
+  "lang.label": "Choose language",
+  "meta.title": "Dark Side of Fintech — Research Study",
+  "app.short": "Research study",
+  "progress": "Step {n} of {total}: {name}",
+  "step.1": "About you",
+  "step.2": "Loan application",
+  "step.3": "Financial literacy",
+  "step.4": "Your experience",
+  "step.5": "Your experience",
+  "step.6": "Final questions",
+  "a11y.required": "(required)",
+  "consent.title": "Dark Side of Fintech: A study on dark patterns in digital lending interfaces",
+  "consent.intro": "This survey is part of the doctoral research study on digital lending interfaces conducted by Sanjogita R, Doctoral Research Scholar, S.P. Jain Institute of Management and Research. It takes about 8–10 minutes. Your responses are completely anonymous.",
+  "req.note": "* Indicates required question",
+  "consent.label": "I have read the information above and voluntarily agree to participate in this study.",
+  "consent.o0": "Yes, I consent to participate",
+  "consent.o1": "No, I do not wish to participate",
+  "err.consent": "Please select an option to continue.",
+  "brief.title": "Before you begin",
+  "brief.p1": "You will shortly interact with a loan application interface. Please treat it as if it were a real application.",
+  "brief.important": "Important:",
+  "brief.li1": "Imagine you need ₹20,000 for an urgent medical expense",
+  "brief.li2": "Complete the application as you naturally would",
+  "brief.li3": "Read all information carefully",
+  "brief.p2": "First, we'll ask a few quick questions about you. Take your time — there is no time pressure.",
+  "btn.begin": "Begin",
+  "loading": "Setting up your application...",
+  "loading.slow": "This is taking longer than usual. Check your internet connection, then try again.",
+  "frame.title": "Loan application",
+  "demo.title": "A few questions about you",
+  "demo.intro": "This helps us understand different perspectives. All responses are completely anonymous and cannot be traced back to you.",
+  "q2.label": "What is your age?",
+  "q2.o0": "18–24 years", "q2.o1": "25–30 years", "q2.o2": "31–35 years", "q2.o3": "36–40 years", "q2.o4": "41–45 years", "q2.o5": "45 and above",
+  "q3.label": "What is your highest education level?",
+  "q3.o0": "Higher Secondary (12th standard)",
+  "q3.o1": "Undergraduate (BE/B.com/B.Sc/BBA/BA etc)",
+  "q3.o2": "Post Graduate (MBA/MA/M.Sc etc)",
+  "q3.o3": "Doctoral (PhD)",
+  "opt.other": "Other:",
+  "opt.otherPh": "Please specify",
+  "q4.label": "What is your current employment status?",
+  "q4.o0": "Salaried-private sector", "q4.o1": "Salaried-government sector", "q4.o2": "Self employed/Business Owner", "q4.o3": "Student", "q4.o4": "Freelancer", "q4.o5": "Unemployed",
+  "q5.label": "What is your approximate monthly income?",
+  "q5.o0": "Below Rs 15000", "q5.o1": "Rs 15000–30000", "q5.o2": "Rs 30001–50000", "q5.o3": "Rs 50001–100000", "q5.o4": "Above Rs 100000", "q5.o5": "Prefer not to say",
+  "q6.label": "Have you ever applied for a loan through a mobile app or a website? (eg: Lazypay, Kredit bee, paysense, Bajaj Finserv etc)",
+  "q6.o0": "Yes, I have applied successfully and taken the loan",
+  "q6.o1": "Yes, I have applied but not complete the process",
+  "q6.o2": "No, but I have browsed such applications",
+  "q6.o3": "No, I have never used such digital lending apps",
+  "q7.label": "How many lending apps do you currently have on your phone?",
+  "q7.o0": "1–2", "q7.o1": "3–5", "q7.o2": "More than 5", "q7.o3": "None",
+  "err.required": "This question is required.",
+  "err.other": "Please type your answer in the box.",
+  "btn.toLoan": "Continue to loan application",
+  "fl.title": "Financial Literacy",
+  "fl.desc": "Answer based on what you know — do not look up answers. There are no penalties for wrong answers.",
+  "q8.label": "You put ₹1,00,000 in a savings account at 2% interest per year. How much will be there after one year?",
+  "q8.o0": "₹1,00,020", "q8.o1": "₹1,02,000", "q8.o2": "₹1,20,000", "q8.o3": "₹1,00,200", "q8.o4": "I don't know",
+  "q9.label": "Your savings account pays 1% interest per year but inflation is 2%. After one year you can buy:",
+  "q9.o0": "More than today", "q9.o1": "Exactly the same", "q9.o2": "Less than today", "q9.o3": "Impossible to tell", "q9.o4": "I don't know",
+  "q10.label": "You have ₹1,00,000 at 10% interest per year. After 5 years you will have:",
+  "q10.o0": "More than ₹1,50,000", "q10.o1": "Exactly ₹1,50,000", "q10.o2": "Less than ₹1,50,000", "q10.o3": "I don't know",
+  "q11.label": "Which statement is correct?",
+  "q11.o0": "Buying shares in one company is less risky than a mutual fund",
+  "q11.o1": "A mutual fund is less risky than buying shares in one company",
+  "q11.o2": "Both carry the same risk",
+  "q11.o3": "I don't know",
+  "q12.label": "You take ₹60,000 loan repayable in 12 equal monthly instalments at 0% interest. What is your monthly EMI?",
+  "q12.o0": "₹6,000", "q12.o1": "₹4,500", "q12.o2": "₹5,000", "q12.o3": "₹7,200", "q12.o4": "I don't know",
+  "pp.title": "Perceived Psychological Pressure",
+  "pp.desc": "The following statements are about how you felt during the loan application. Please rate how much you agree with each statement. There is no right or wrong answer.",
+  "p1.label": "I felt rushed while making my loan decision",
+  "p2.label": "I felt pressured to choose a higher loan amount than I originally intended",
+  "p3.label": "I felt anxious or stressed at any point during the application",
+  "p4.label": "I felt I might miss out on something if I did not act quickly",
+  "p5.label": "I felt I had enough time to carefully read all the information before deciding",
+  "p6.label": "I felt calm and in control throughout the application process",
+  "dc.title": "Decision Confidence",
+  "dc.desc": "Please rate how much you agree with each of the following statements about your experience.",
+  "scale.key": "Scale:",
+  "d1.label": "I am confident I understood the loan terms before I submitted the application",
+  "d2.label": "I am satisfied with the loan amount I chose",
+  "d3.label": "I felt I had enough information to make a good decision",
+  "d4.label": "I am not sure whether I made the right choice",
+  "d5.label": "I would want to re-read the loan terms before taking this loan in real life",
+  "likert.1": "Strongly disagree",
+  "likert.2": "Disagree",
+  "likert.3": "Neither agree nor disagree",
+  "likert.4": "Agree",
+  "likert.5": "Strongly agree",
+  "likert.hint": "Choose a number from 1 to 5",
+  "likert.picked": "Your answer: {label} ({n})",
+  "dp.title": "What You Noticed",
+  "dp.desc": "A few final questions about what you noticed during the application. Please answer honestly — this is not a test.",
+  "x1.label": "During the application, did you notice a countdown timer or any indication that an offer was time-limited?",
+  "x2.label": "Did you see any messages about other users taking loans at the same time (e.g., \"X people are viewing this offer right now\")?",
+  "yn.o0": "Yes", "yn.o1": "No", "yn.o2": "Maybe, but I am not certain", "yn.o3": "Not sure what this means",
+  "x3.label": "Was a specific loan amount already selected or highlighted when the application loaded?",
+  "x3.o0": "Yes, a higher amount was already selected",
+  "x3.o1": "Yes, but I am not sure if it was higher or just a default",
+  "x3.o2": "No, I had to choose the amount myself",
+  "x3.o3": "I do not remember",
+  "x4.label": "How straightforward did you find it to locate the fee and repayment information during the application?",
+  "x4.o0": "Very easy — it was clearly displayed",
+  "x4.o1": "Somewhat easy",
+  "x4.o2": "Neutral",
+  "x4.o3": "Somewhat difficult — I had to look for it",
+  "x4.o4": "Very difficult — the information was hard to find",
+  "btn.next": "Next",
+  "btn.back": "Back",
+  "btn.submit": "Submit all responses",
+  "btn.retry": "Try again",
+  "submitting": "Submitting your responses...",
+  "ty.title": "Thank you for participating!",
+  "ty.body": "Your responses have been recorded successfully. This study examines how interface design affects financial decision-making.",
+  "ty.name": "Sanjogita R",
+  "ty.inst": "S.P. Jain Institute of Management and Research",
+  "fail.title": "Your responses were not sent",
+  "fail.body": "Check your internet connection and try again. Your answers are still saved on this page.",
+  "declined.title": "Thank you for your consideration",
+  "declined.body": "We respect your decision. You may close this page."
+},
+"hi": {
+  "lang.name": "हिन्दी",
+  "lang.label": "भाषा चुनें",
+  "meta.title": "फिनटेक का अंधेरा पहलू — शोध अध्ययन",
+  "app.short": "शोध अध्ययन",
+  "progress": "कुल {total} में से चरण {n}: {name}",
+  "step.1": "आपके बारे में",
+  "step.2": "लोन आवेदन",
+  "step.3": "वित्तीय साक्षरता",
+  "step.4": "आपका अनुभव",
+  "step.5": "आपका अनुभव",
+  "step.6": "आख़िरी सवाल",
+  "a11y.required": "(ज़रूरी)",
+  "consent.title": "फिनटेक का अंधेरा पहलू: डिजिटल लोन ऐप और वेबसाइट के डिज़ाइन में डार्क पैटर्न पर एक अध्ययन",
+  "consent.intro": "यह सर्वे डिजिटल लोन ऐप और वेबसाइट के डिज़ाइन पर एक डॉक्टरेट शोध का हिस्सा है। यह शोध एस.पी. जैन इंस्टीट्यूट ऑफ़ मैनेजमेंट एंड रिसर्च की डॉक्टरेट शोधार्थी संजोगिता आर. द्वारा किया जा रहा है। इसमें लगभग 8–10 मिनट लगेंगे। आपके जवाब पूरी तरह गुमनाम रहेंगे।",
+  "req.note": "* वाले सवालों का जवाब देना ज़रूरी है",
+  "consent.label": "मैंने ऊपर दी गई जानकारी पढ़ ली है और मैं अपनी मर्ज़ी से इस अध्ययन में भाग लेने के लिए सहमत हूँ।",
+  "consent.o0": "हाँ, मैं भाग लेने के लिए सहमत हूँ",
+  "consent.o1": "नहीं, मुझे भाग नहीं लेना है",
+  "err.consent": "आगे बढ़ने के लिए कृपया एक विकल्प चुनें।",
+  "brief.title": "शुरू करने से पहले",
+  "brief.p1": "थोड़ी देर में आप एक लोन आवेदन की स्क्रीन इस्तेमाल करेंगे। कृपया इसे असली आवेदन समझकर ही भरें।",
+  "brief.important": "ज़रूरी बातें:",
+  "brief.li1": "मान लीजिए कि आपको किसी ज़रूरी इलाज के ख़र्च के लिए ₹20,000 चाहिए",
+  "brief.li2": "आवेदन अपने सामान्य तरीके से भरें",
+  "brief.li3": "सारी जानकारी ध्यान से पढ़ें",
+  "brief.p2": "पहले हम आपके बारे में कुछ छोटे सवाल पूछेंगे। आराम से जवाब दें — समय की कोई पाबंदी नहीं है।",
+  "btn.begin": "शुरू करें",
+  "loading": "आपका आवेदन तैयार हो रहा है...",
+  "loading.slow": "इसमें सामान्य से ज़्यादा समय लग रहा है। अपना इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें।",
+  "frame.title": "लोन आवेदन",
+  "demo.title": "आपके बारे में कुछ सवाल",
+  "demo.intro": "इससे हमें अलग-अलग लोगों का नज़रिया समझने में मदद मिलती है। सभी जवाब पूरी तरह गुमनाम हैं और इनसे आपकी पहचान नहीं की जा सकती।",
+  "q2.label": "आपकी उम्र क्या है?",
+  "q2.o0": "18–24 वर्ष", "q2.o1": "25–30 वर्ष", "q2.o2": "31–35 वर्ष", "q2.o3": "36–40 वर्ष", "q2.o4": "41–45 वर्ष", "q2.o5": "45 वर्ष और उससे अधिक",
+  "q3.label": "आपने सबसे ज़्यादा कहाँ तक पढ़ाई की है?",
+  "q3.o0": "हायर सेकेंडरी (12वीं कक्षा)",
+  "q3.o1": "ग्रेजुएशन (BE/B.Com/B.Sc/BBA/BA आदि)",
+  "q3.o2": "पोस्ट ग्रेजुएशन (MBA/MA/M.Sc आदि)",
+  "q3.o3": "डॉक्टरेट (PhD)",
+  "opt.other": "अन्य:",
+  "opt.otherPh": "कृपया लिखें",
+  "q4.label": "अभी आपकी रोज़गार की स्थिति क्या है?",
+  "q4.o0": "नौकरी – प्राइवेट सेक्टर", "q4.o1": "नौकरी – सरकारी सेक्टर", "q4.o2": "स्व-रोज़गार / अपना व्यवसाय", "q4.o3": "विद्यार्थी", "q4.o4": "फ्रीलांसर", "q4.o5": "बेरोज़गार",
+  "q5.label": "आपकी लगभग मासिक आय कितनी है?",
+  "q5.o0": "15000 रुपये से कम", "q5.o1": "15000–30000 रुपये", "q5.o2": "30001–50000 रुपये", "q5.o3": "50001–100000 रुपये", "q5.o4": "100000 रुपये से ज़्यादा", "q5.o5": "बताना पसंद नहीं",
+  "q6.label": "क्या आपने कभी किसी मोबाइल ऐप या वेबसाइट से लोन के लिए आवेदन किया है? (जैसे: Lazypay, Kredit bee, paysense, Bajaj Finserv आदि)",
+  "q6.o0": "हाँ, मैंने आवेदन किया और लोन ले लिया",
+  "q6.o1": "हाँ, मैंने आवेदन किया पर पूरी प्रक्रिया पूरी नहीं की",
+  "q6.o2": "नहीं, पर मैंने ऐसे ऐप या वेबसाइट देखे हैं",
+  "q6.o3": "नहीं, मैंने ऐसे डिजिटल लोन ऐप कभी इस्तेमाल नहीं किए",
+  "q7.label": "अभी आपके फ़ोन में कितने लोन ऐप हैं?",
+  "q7.o0": "1–2", "q7.o1": "3–5", "q7.o2": "5 से ज़्यादा", "q7.o3": "एक भी नहीं",
+  "err.required": "इस सवाल का जवाब देना ज़रूरी है।",
+  "err.other": "कृपया बॉक्स में अपना जवाब लिखें।",
+  "btn.toLoan": "लोन आवेदन पर आगे बढ़ें",
+  "fl.title": "वित्तीय साक्षरता",
+  "fl.desc": "जो आप जानते हैं, उसी के आधार पर जवाब दें — जवाब कहीं खोजें नहीं। ग़लत जवाब का कोई नुक़सान नहीं है।",
+  "q8.label": "आप ₹1,00,000 एक बचत खाते में जमा करते हैं, जिस पर हर साल 2% ब्याज मिलता है। एक साल बाद खाते में कितने पैसे होंगे?",
+  "q8.o0": "₹1,00,020", "q8.o1": "₹1,02,000", "q8.o2": "₹1,20,000", "q8.o3": "₹1,00,200", "q8.o4": "पता नहीं",
+  "q9.label": "आपके बचत खाते पर हर साल 1% ब्याज मिलता है, लेकिन महँगाई दर 2% है। एक साल बाद इस पैसे से कितना सामान ख़रीदा जा सकेगा?",
+  "q9.o0": "आज से ज़्यादा", "q9.o1": "ठीक उतना ही", "q9.o2": "आज से कम", "q9.o3": "बताना संभव नहीं", "q9.o4": "पता नहीं",
+  "q10.label": "आपके ₹1,00,000 पर हर साल 10% ब्याज मिलता है। 5 साल बाद आपके पास कितने पैसे होंगे?",
+  "q10.o0": "₹1,50,000 से ज़्यादा", "q10.o1": "ठीक ₹1,50,000", "q10.o2": "₹1,50,000 से कम", "q10.o3": "पता नहीं",
+  "q11.label": "इनमें से कौन-सी बात सही है?",
+  "q11.o0": "एक ही कंपनी के शेयर ख़रीदना, म्यूचुअल फ़ंड से कम जोखिम वाला है",
+  "q11.o1": "म्यूचुअल फ़ंड, एक ही कंपनी के शेयर ख़रीदने से कम जोखिम वाला है",
+  "q11.o2": "दोनों में बराबर जोखिम है",
+  "q11.o3": "पता नहीं",
+  "q12.label": "आप ₹60,000 का लोन लेते हैं, जिसे 0% ब्याज पर 12 बराबर मासिक किस्तों में चुकाना है। आपकी मासिक EMI कितनी होगी?",
+  "q12.o0": "₹6,000", "q12.o1": "₹4,500", "q12.o2": "₹5,000", "q12.o3": "₹7,200", "q12.o4": "पता नहीं",
+  "pp.title": "मानसिक दबाव का अनुभव",
+  "pp.desc": "नीचे लिखी बातें इस बारे में हैं कि लोन आवेदन भरते समय आपको कैसा महसूस हुआ। कृपया बताएँ कि आप हर बात से कितना सहमत हैं। कोई जवाब सही या ग़लत नहीं है।",
+  "p1.label": "लोन का फ़ैसला लेते समय मुझे जल्दबाज़ी महसूस हुई",
+  "p2.label": "मुझ पर, पहले से सोची गई रकम से ज़्यादा लोन चुनने का दबाव महसूस हुआ",
+  "p3.label": "आवेदन के दौरान किसी भी समय मुझे घबराहट या तनाव महसूस हुआ",
+  "p4.label": "मुझे लगा कि अगर मैंने जल्दी नहीं की, तो कोई मौक़ा हाथ से निकल जाएगा",
+  "p5.label": "मुझे लगा कि फ़ैसला लेने से पहले सारी जानकारी ध्यान से पढ़ने के लिए मेरे पास काफ़ी समय था",
+  "p6.label": "पूरी आवेदन प्रक्रिया के दौरान मुझे सुकून रहा और लगा कि सब कुछ मेरे काबू में है",
+  "dc.title": "फ़ैसले पर भरोसा",
+  "dc.desc": "अपने अनुभव के बारे में नीचे लिखी हर बात से आप कितना सहमत हैं, कृपया बताएँ।",
+  "scale.key": "जवाब के विकल्प:",
+  "d1.label": "मुझे भरोसा है कि आवेदन जमा करने से पहले मैंने लोन की शर्तें समझ ली थीं",
+  "d2.label": "मैंने जो लोन रकम चुनी, उससे मैं संतुष्ट हूँ",
+  "d3.label": "मुझे लगा कि अच्छा फ़ैसला लेने के लिए मेरे पास काफ़ी जानकारी थी",
+  "d4.label": "मुझे पक्का नहीं पता कि मैंने सही चुनाव किया या नहीं",
+  "d5.label": "असल ज़िंदगी में यह लोन लेने से पहले मेरी इच्छा होगी कि मैं लोन की शर्तें दोबारा पढ़ूँ",
+  "likert.1": "पूरी तरह असहमत",
+  "likert.2": "असहमत",
+  "likert.3": "न सहमत, न असहमत",
+  "likert.4": "सहमत",
+  "likert.5": "पूरी तरह सहमत",
+  "likert.hint": "1 से 5 में से एक नंबर चुनें",
+  "likert.picked": "आपका जवाब: {label} ({n})",
+  "dp.title": "आपने क्या देखा",
+  "dp.desc": "आवेदन के दौरान आपने जो देखा, उसके बारे में कुछ आख़िरी सवाल। कृपया ईमानदारी से जवाब दें — यह कोई परीक्षा नहीं है।",
+  "x1.label": "आवेदन के दौरान क्या आपने कोई उलटी गिनती वाला टाइमर, या ऐसा कोई संकेत देखा कि ऑफ़र सिर्फ़ कुछ समय के लिए है?",
+  "x2.label": "क्या आपने ऐसा कोई संदेश देखा कि उसी समय दूसरे लोग भी लोन ले रहे हैं (जैसे, “अभी X लोग यह ऑफ़र देख रहे हैं”)?",
+  "yn.o0": "हाँ", "yn.o1": "नहीं", "yn.o2": "शायद, पर पक्का नहीं पता", "yn.o3": "समझ नहीं आया कि इसका मतलब क्या है",
+  "x3.label": "जब आवेदन खुला, तब क्या कोई ख़ास लोन रकम पहले से चुनी हुई या हाइलाइट की हुई थी?",
+  "x3.o0": "हाँ, एक बड़ी रकम पहले से चुनी हुई थी",
+  "x3.o1": "हाँ, पर पक्का नहीं पता कि वह बड़ी रकम थी या बस डिफ़ॉल्ट रकम",
+  "x3.o2": "नहीं, रकम मुझे ख़ुद चुननी पड़ी",
+  "x3.o3": "मुझे याद नहीं",
+  "x4.label": "आवेदन के दौरान फ़ीस और लोन चुकाने से जुड़ी जानकारी ढूँढना आपको कितना आसान लगा?",
+  "x4.o0": "बहुत आसान — जानकारी साफ़-साफ़ दिखाई गई थी",
+  "x4.o1": "कुछ हद तक आसान",
+  "x4.o2": "न आसान, न मुश्किल",
+  "x4.o3": "कुछ हद तक मुश्किल — मुझे जानकारी ढूँढनी पड़ी",
+  "x4.o4": "बहुत मुश्किल — जानकारी ढूँढना कठिन था",
+  "btn.next": "आगे",
+  "btn.back": "पीछे",
+  "btn.submit": "सभी जवाब जमा करें",
+  "btn.retry": "फिर से कोशिश करें",
+  "submitting": "आपके जवाब भेजे जा रहे हैं...",
+  "ty.title": "भाग लेने के लिए धन्यवाद!",
+  "ty.body": "आपके जवाब सफलतापूर्वक दर्ज हो गए हैं। यह अध्ययन देखता है कि ऐप और वेबसाइट का डिज़ाइन पैसों से जुड़े फ़ैसलों पर कैसे असर डालता है।",
+  "ty.name": "संजोगिता आर.",
+  "ty.inst": "एस.पी. जैन इंस्टीट्यूट ऑफ़ मैनेजमेंट एंड रिसर्च",
+  "fail.title": "आपके जवाब नहीं भेजे जा सके",
+  "fail.body": "अपना इंटरनेट कनेक्शन जाँचें और फिर से कोशिश करें। आपके जवाब इस पेज पर अब भी सुरक्षित हैं।",
+  "declined.title": "आपके समय के लिए धन्यवाद",
+  "declined.body": "हम आपके फ़ैसले का सम्मान करते हैं। आप यह पेज बंद कर सकते हैं।"
+},
+"mr": {
+  "lang.name": "मराठी",
+  "lang.label": "भाषा निवडा",
+  "meta.title": "फिनटेकची काळी बाजू — संशोधन अभ्यास",
+  "app.short": "संशोधन अभ्यास",
+  "progress": "एकूण {total} पैकी टप्पा {n}: {name}",
+  "step.1": "तुमच्याबद्दल",
+  "step.2": "कर्ज अर्ज",
+  "step.3": "आर्थिक साक्षरता",
+  "step.4": "तुमचा अनुभव",
+  "step.5": "तुमचा अनुभव",
+  "step.6": "शेवटचे प्रश्न",
+  "a11y.required": "(आवश्यक)",
+  "consent.title": "फिनटेकची काळी बाजू: डिजिटल कर्ज ॲप आणि वेबसाइटच्या डिझाइनमधील डार्क पॅटर्नवर एक अभ्यास",
+  "consent.intro": "हे सर्वेक्षण डिजिटल कर्ज ॲप आणि वेबसाइटच्या डिझाइनवरील डॉक्टरेट संशोधनाचा भाग आहे. हे संशोधन एस. पी. जैन इन्स्टिट्यूट ऑफ मॅनेजमेंट अँड रिसर्चमधील डॉक्टरेट संशोधक संजोगिता आर. यांच्यामार्फत केले जात आहे. याला साधारण 8–10 मिनिटे लागतील. तुमची उत्तरे पूर्णपणे निनावी राहतील.",
+  "req.note": "* असलेल्या प्रश्नांचे उत्तर देणे आवश्यक आहे",
+  "consent.label": "मी वरील माहिती वाचली आहे आणि मी स्वेच्छेने या अभ्यासात सहभागी होण्यास तयार आहे.",
+  "consent.o0": "होय, सहभागी होण्यास माझी संमती आहे",
+  "consent.o1": "नाही, मला सहभागी व्हायचे नाही",
+  "err.consent": "पुढे जाण्यासाठी कृपया एक पर्याय निवडा.",
+  "brief.title": "सुरू करण्यापूर्वी",
+  "brief.p1": "थोड्याच वेळात तुम्ही एका कर्ज अर्जाची स्क्रीन वापराल. कृपया तो खरा अर्ज आहे असे समजूनच भरा.",
+  "brief.important": "महत्त्वाचे:",
+  "brief.li1": "समजा, तुम्हाला तातडीच्या वैद्यकीय खर्चासाठी ₹20,000 हवे आहेत",
+  "brief.li2": "अर्ज तुमच्या नेहमीच्या पद्धतीनेच भरा",
+  "brief.li3": "सर्व माहिती काळजीपूर्वक वाचा",
+  "brief.p2": "आधी आम्ही तुमच्याबद्दल काही छोटे प्रश्न विचारू. सावकाश उत्तरे द्या — वेळेचे कोणतेही बंधन नाही.",
+  "btn.begin": "सुरू करा",
+  "loading": "तुमचा अर्ज तयार होत आहे...",
+  "loading.slow": "याला नेहमीपेक्षा जास्त वेळ लागत आहे. तुमचे इंटरनेट कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.",
+  "frame.title": "कर्ज अर्ज",
+  "demo.title": "तुमच्याबद्दल काही प्रश्न",
+  "demo.intro": "यामुळे आम्हाला वेगवेगळ्या लोकांचे दृष्टिकोन समजून घेण्यास मदत होते. सर्व उत्तरे पूर्णपणे निनावी आहेत आणि त्यावरून तुमची ओळख पटवता येत नाही.",
+  "q2.label": "तुमचे वय किती आहे?",
+  "q2.o0": "18–24 वर्षे", "q2.o1": "25–30 वर्षे", "q2.o2": "31–35 वर्षे", "q2.o3": "36–40 वर्षे", "q2.o4": "41–45 वर्षे", "q2.o5": "45 वर्षे आणि त्याहून अधिक",
+  "q3.label": "तुमचे सर्वोच्च शिक्षण कोणते आहे?",
+  "q3.o0": "उच्च माध्यमिक (12वी)",
+  "q3.o1": "पदवी (BE/B.Com/B.Sc/BBA/BA इ.)",
+  "q3.o2": "पदव्युत्तर (MBA/MA/M.Sc इ.)",
+  "q3.o3": "डॉक्टरेट (PhD)",
+  "opt.other": "इतर:",
+  "opt.otherPh": "कृपया नमूद करा",
+  "q4.label": "तुमची सध्याची रोजगार स्थिती काय आहे?",
+  "q4.o0": "नोकरी – खाजगी क्षेत्र", "q4.o1": "नोकरी – सरकारी क्षेत्र", "q4.o2": "स्वयंरोजगार / स्वतःचा व्यवसाय", "q4.o3": "विद्यार्थी", "q4.o4": "फ्रीलान्सर", "q4.o5": "बेरोजगार",
+  "q5.label": "तुमचे अंदाजे मासिक उत्पन्न किती आहे?",
+  "q5.o0": "15000 रुपयांपेक्षा कमी", "q5.o1": "15000–30000 रुपये", "q5.o2": "30001–50000 रुपये", "q5.o3": "50001–100000 रुपये", "q5.o4": "100000 रुपयांपेक्षा जास्त", "q5.o5": "सांगू इच्छित नाही",
+  "q6.label": "तुम्ही कधी मोबाइल ॲप किंवा वेबसाइटद्वारे कर्जासाठी अर्ज केला आहे का? (उदा.: Lazypay, Kredit bee, paysense, Bajaj Finserv इ.)",
+  "q6.o0": "होय, मी अर्ज केला आणि कर्जही घेतले",
+  "q6.o1": "होय, मी अर्ज केला पण पूर्ण प्रक्रिया केली नाही",
+  "q6.o2": "नाही, पण मी असे ॲप किंवा वेबसाइट पाहिले आहेत",
+  "q6.o3": "नाही, मी असे डिजिटल कर्ज ॲप कधीच वापरले नाहीत",
+  "q7.label": "सध्या तुमच्या फोनमध्ये किती कर्ज ॲप आहेत?",
+  "q7.o0": "1–2", "q7.o1": "3–5", "q7.o2": "5 पेक्षा जास्त", "q7.o3": "एकही नाही",
+  "err.required": "या प्रश्नाचे उत्तर देणे आवश्यक आहे.",
+  "err.other": "कृपया चौकटीत तुमचे उत्तर लिहा.",
+  "btn.toLoan": "कर्ज अर्जाकडे पुढे जा",
+  "fl.title": "आर्थिक साक्षरता",
+  "fl.desc": "तुम्हाला जे माहीत आहे त्यावरूनच उत्तर द्या — उत्तरे कुठेही शोधू नका. चुकीच्या उत्तरासाठी कोणताही दंड नाही.",
+  "q8.label": "तुम्ही ₹1,00,000 बचत खात्यात ठेवता, ज्यावर दरवर्षी 2% व्याज मिळते. एका वर्षानंतर खात्यात किती रक्कम असेल?",
+  "q8.o0": "₹1,00,020", "q8.o1": "₹1,02,000", "q8.o2": "₹1,20,000", "q8.o3": "₹1,00,200", "q8.o4": "माहीत नाही",
+  "q9.label": "तुमच्या बचत खात्यावर दरवर्षी 1% व्याज मिळते, पण महागाईचा दर 2% आहे. एका वर्षानंतर या पैशांतून तुम्ही किती खरेदी करू शकाल?",
+  "q9.o0": "आजपेक्षा जास्त", "q9.o1": "अगदी तेवढीच", "q9.o2": "आजपेक्षा कमी", "q9.o3": "सांगणे शक्य नाही", "q9.o4": "माहीत नाही",
+  "q10.label": "तुमच्या ₹1,00,000 वर दरवर्षी 10% व्याज मिळते. 5 वर्षांनंतर तुमच्याकडे किती रक्कम असेल?",
+  "q10.o0": "₹1,50,000 पेक्षा जास्त", "q10.o1": "अगदी ₹1,50,000", "q10.o2": "₹1,50,000 पेक्षा कमी", "q10.o3": "माहीत नाही",
+  "q11.label": "यापैकी कोणते विधान बरोबर आहे?",
+  "q11.o0": "एकाच कंपनीचे शेअर्स घेणे म्युच्युअल फंडपेक्षा कमी जोखमीचे आहे",
+  "q11.o1": "म्युच्युअल फंड हा एकाच कंपनीचे शेअर्स घेण्यापेक्षा कमी जोखमीचा आहे",
+  "q11.o2": "दोन्हींमध्ये सारखीच जोखीम आहे",
+  "q11.o3": "माहीत नाही",
+  "q12.label": "तुम्ही ₹60,000 चे कर्ज घेता, जे 0% व्याजाने 12 समान मासिक हप्त्यांमध्ये फेडायचे आहे. तुमचा मासिक EMI किती असेल?",
+  "q12.o0": "₹6,000", "q12.o1": "₹4,500", "q12.o2": "₹5,000", "q12.o3": "₹7,200", "q12.o4": "माहीत नाही",
+  "pp.title": "जाणवलेला मानसिक दबाव",
+  "pp.desc": "खालील विधाने कर्ज अर्ज भरताना तुम्हाला कसे वाटले याबद्दल आहेत. प्रत्येक विधानाशी तुम्ही किती सहमत आहात ते कृपया सांगा. कोणतेही उत्तर बरोबर किंवा चूक नाही.",
+  "p1.label": "कर्जाचा निर्णय घेताना मला घाई होत असल्यासारखे वाटले",
+  "p2.label": "मी आधी ठरवलेल्या रकमेपेक्षा जास्त कर्ज निवडण्याचा माझ्यावर दबाव आहे असे मला वाटले",
+  "p3.label": "अर्ज भरताना कोणत्याही क्षणी मला चिंता किंवा ताण जाणवला",
+  "p4.label": "मी लवकर निर्णय घेतला नाही, तर काहीतरी हातून निसटेल असे मला वाटले",
+  "p5.label": "निर्णय घेण्यापूर्वी सर्व माहिती काळजीपूर्वक वाचण्यासाठी माझ्याकडे पुरेसा वेळ होता असे मला वाटले",
+  "p6.label": "संपूर्ण अर्ज प्रक्रियेदरम्यान मला शांत वाटले आणि सर्व काही माझ्या नियंत्रणात आहे असे वाटले",
+  "dc.title": "निर्णयाबद्दलचा आत्मविश्वास",
+  "dc.desc": "तुमच्या अनुभवाबद्दल खालील प्रत्येक विधानाशी तुम्ही किती सहमत आहात, ते कृपया सांगा.",
+  "scale.key": "उत्तराचे पर्याय:",
+  "d1.label": "अर्ज सबमिट करण्यापूर्वी मला कर्जाच्या अटी समजल्या होत्या, याची मला खात्री आहे",
+  "d2.label": "मी निवडलेल्या कर्जाच्या रकमेबद्दल मी समाधानी आहे",
+  "d3.label": "चांगला निर्णय घेण्यासाठी माझ्याकडे पुरेशी माहिती होती असे मला वाटले",
+  "d4.label": "मी योग्य निवड केली की नाही, याबद्दल मला खात्री नाही",
+  "d5.label": "प्रत्यक्ष आयुष्यात हे कर्ज घेण्यापूर्वी मला कर्जाच्या अटी पुन्हा वाचायला आवडेल",
+  "likert.1": "पूर्णपणे असहमत",
+  "likert.2": "असहमत",
+  "likert.3": "सहमतही नाही, असहमतही नाही",
+  "likert.4": "सहमत",
+  "likert.5": "पूर्णपणे सहमत",
+  "likert.hint": "1 ते 5 पैकी एक क्रमांक निवडा",
+  "likert.picked": "तुमचे उत्तर: {label} ({n})",
+  "dp.title": "तुम्हाला काय दिसले",
+  "dp.desc": "अर्ज भरताना तुम्हाला काय दिसले, याबद्दल काही शेवटचे प्रश्न. कृपया प्रामाणिकपणे उत्तर द्या — ही परीक्षा नाही.",
+  "x1.label": "अर्ज भरताना तुम्हाला काउंटडाउन टायमर, किंवा ऑफर फक्त मर्यादित वेळेसाठी आहे असा कोणताही संकेत दिसला का?",
+  "x2.label": "त्याच वेळी इतर लोकही कर्ज घेत आहेत, असा कोणताही संदेश तुम्हाला दिसला का (उदा., “सध्या X लोक ही ऑफर पाहत आहेत”)?",
+  "yn.o0": "होय", "yn.o1": "नाही", "yn.o2": "कदाचित, पण खात्री नाही", "yn.o3": "याचा अर्थ काय ते समजले नाही",
+  "x3.label": "अर्ज उघडला तेव्हा एखादी विशिष्ट कर्ज रक्कम आधीच निवडलेली किंवा ठळक दाखवलेली होती का?",
+  "x3.o0": "होय, जास्त रक्कम आधीच निवडलेली होती",
+  "x3.o1": "होय, पण ती जास्त रक्कम होती की फक्त डिफॉल्ट, याची खात्री नाही",
+  "x3.o2": "नाही, रक्कम मला स्वतः निवडावी लागली",
+  "x3.o3": "मला आठवत नाही",
+  "x4.label": "अर्ज भरताना शुल्क आणि परतफेडीची माहिती शोधणे तुम्हाला किती सोपे वाटले?",
+  "x4.o0": "खूप सोपे — माहिती स्पष्टपणे दाखवली होती",
+  "x4.o1": "थोडेफार सोपे",
+  "x4.o2": "ना सोपे, ना अवघड",
+  "x4.o3": "थोडे अवघड — मला माहिती शोधावी लागली",
+  "x4.o4": "खूप अवघड — माहिती शोधणे कठीण होते",
+  "btn.next": "पुढे",
+  "btn.back": "मागे",
+  "btn.submit": "सर्व उत्तरे सबमिट करा",
+  "btn.retry": "पुन्हा प्रयत्न करा",
+  "submitting": "तुमची उत्तरे पाठवली जात आहेत...",
+  "ty.title": "सहभागी झाल्याबद्दल धन्यवाद!",
+  "ty.body": "तुमची उत्तरे यशस्वीरीत्या नोंदवली गेली आहेत. ॲप आणि वेबसाइटच्या डिझाइनचा आर्थिक निर्णयांवर कसा परिणाम होतो, याचा हा अभ्यास करतो.",
+  "ty.name": "संजोगिता आर.",
+  "ty.inst": "एस. पी. जैन इन्स्टिट्यूट ऑफ मॅनेजमेंट अँड रिसर्च",
+  "fail.title": "तुमची उत्तरे पाठवता आली नाहीत",
+  "fail.body": "तुमचे इंटरनेट कनेक्शन तपासा आणि पुन्हा प्रयत्न करा. तुमची उत्तरे या पेजवर अजूनही जतन आहेत.",
+  "declined.title": "तुमच्या वेळेबद्दल धन्यवाद",
+  "declined.body": "आम्ही तुमच्या निर्णयाचा आदर करतो. तुम्ही हे पेज बंद करू शकता."
+}
+}
+</script>
 </head>
 <body>
-<div class="container">
-
-<!-- CONSENT + SCENARIO (merged) -->
-<div id="screen-consent" class="screen active">
-  <div class="header-card"><div class="header-banner"></div><div class="header-content">
-    <h1>Dark Side of Fintech: A study on dark patterns in digital lending interfaces</h1>
-    <p>This survey is part of the doctoral research study on digital lending interfaces conducted by Sanjogita R, Doctoral Research Scholar, S.P. Jain Institute of Management and Research. It takes about 8–10 minutes. Your responses are completely anonymous.</p>
-    <div class="req-note">* Indicates required question</div>
-  </div></div>
-
-  <div class="q-card" id="card-consent"><div class="q-label">I have read the information above and voluntarily agree to participate in this study.<span class="req"> *</span></div>
-    <div class="options">
-      <label class="option"><input type="radio" name="consent" value="yes"><span>Yes, I consent to participate</span></label>
-      <label class="option"><input type="radio" name="consent" value="no"><span>No, I do not wish to participate</span></label>
-    </div><div class="error-msg">Please select an option to continue.</div>
-  </div>
-
-  <div class="scenario-card"><h2>Before you begin</h2><p>You will shortly interact with a loan application interface. Please treat it as if it were a real application.</p><p class="important">IMPORTANT:</p>
-    <ul class="checklist"><li>Imagine you need ₹20,000 for an urgent medical expense</li><li>Complete the application as you naturally would</li><li>Read all information carefully</li></ul>
-    <p style="margin-top:16px;color:var(--text)">First, we'll ask a few quick questions about you. Take your time — there is no time pressure.</p>
-  </div>
-
-  <div class="btn-row"><button class="btn btn-primary" onclick="handleConsent()">Begin →</button><span></span></div>
+<header class="topbar">
+  <span class="brand" data-i18n="app.short"></span>
+  <nav class="lang" id="langNav"></nav>
+</header>
+<div class="progress" id="progress" hidden>
+  <p class="progress-text" id="progressText"></p>
+  <div class="track"><div class="fill" id="progressFill"></div></div>
 </div>
-
-<!-- LOADING -->
-<div id="screen-loading" class="screen"><div class="loader-box"><div class="spin"></div><div class="loader-text">Setting up your application...</div></div></div>
-
-<!-- INTERFACE -->
-<div id="screen-interface" class="screen">
-  <div class="step-info">Step 2 of 6 — Loan Application</div>
-  <div class="iframe-wrap"><iframe id="loanFrame" allow=""></iframe></div>
-</div>
-
-<!-- DEMOGRAPHICS -->
-<div id="screen-demographics" class="screen">
-  <div class="step-info">Step 1 of 6 — About You</div>
-  <div class="header-card"><div class="header-banner"></div><div class="header-content"><h1>A few questions about you</h1><p>This helps us understand different perspectives. All responses are completely anonymous and cannot be traced back to you.</p></div></div>
-
-  <div class="q-card" id="card-q2"><div class="q-label">What is your age?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q2" value="18–24 years"><span>18–24 years</span></label>
-    <label class="option"><input type="radio" name="q2" value="25–30 years"><span>25–30 years</span></label>
-    <label class="option"><input type="radio" name="q2" value="31–35 years"><span>31–35 years</span></label>
-    <label class="option"><input type="radio" name="q2" value="36–40 years"><span>36–40 years</span></label>
-    <label class="option"><input type="radio" name="q2" value="41–45 years"><span>41–45 years</span></label>
-    <label class="option"><input type="radio" name="q2" value="45 and above"><span>45 and above</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q3"><div class="q-label">What is your highest education level?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q3" value="Higher Secondary (12th standard)"><span>Higher Secondary (12th standard)</span></label>
-    <label class="option"><input type="radio" name="q3" value="Undergraduate (BE/B.com/B.Sc/BBA/BA etc)"><span>Undergraduate (BE/B.com/B.Sc/BBA/BA etc)</span></label>
-    <label class="option"><input type="radio" name="q3" value="Post Graduate (MBA/MA/M.Sc etc)"><span>Post Graduate (MBA/MA/M.Sc etc)</span></label>
-    <label class="option"><input type="radio" name="q3" value="Doctoral (PhD)"><span>Doctoral (PhD)</span></label>
-    <label class="option"><input type="radio" name="q3" value="other" onchange="toggleOther('q3')"><span>Other:</span><input type="text" class="other-field" id="q3-other" disabled placeholder="Please specify"></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q4"><div class="q-label">What is your current employment status?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q4" value="Salaried-private sector"><span>Salaried-private sector</span></label>
-    <label class="option"><input type="radio" name="q4" value="Salaried-government sector"><span>Salaried-government sector</span></label>
-    <label class="option"><input type="radio" name="q4" value="Self employed/Business Owner"><span>Self employed/Business Owner</span></label>
-    <label class="option"><input type="radio" name="q4" value="Student"><span>Student</span></label>
-    <label class="option"><input type="radio" name="q4" value="Freelancer"><span>Freelancer</span></label>
-    <label class="option"><input type="radio" name="q4" value="Unemployed"><span>Unemployed</span></label>
-    <label class="option"><input type="radio" name="q4" value="other" onchange="toggleOther('q4')"><span>Other:</span><input type="text" class="other-field" id="q4-other" disabled placeholder="Please specify"></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q5"><div class="q-label">What is your approximate monthly income?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q5" value="Below Rs 15000"><span>Below Rs 15000</span></label>
-    <label class="option"><input type="radio" name="q5" value="Rs 15000–30000"><span>Rs 15000–30000</span></label>
-    <label class="option"><input type="radio" name="q5" value="Rs 30001–50000"><span>Rs 30001–50000</span></label>
-    <label class="option"><input type="radio" name="q5" value="Rs 50001–100000"><span>Rs 50001–100000</span></label>
-    <label class="option"><input type="radio" name="q5" value="Above Rs 100000"><span>Above Rs 100000</span></label>
-    <label class="option"><input type="radio" name="q5" value="Prefer not to say"><span>Prefer not to say</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q6"><div class="q-label">Have you ever applied for a loan through a mobile app or a website? (eg: Lazypay, Kredit bee, paysense, Bajaj Finserv etc)<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q6" value="Yes, I have applied successfully and taken the loan"><span>Yes, I have applied successfully and taken the loan</span></label>
-    <label class="option"><input type="radio" name="q6" value="Yes, I have applied but not complete the process"><span>Yes, I have applied but not complete the process</span></label>
-    <label class="option"><input type="radio" name="q6" value="No, but I have browsed such applications"><span>No, but I have browsed such applications</span></label>
-    <label class="option"><input type="radio" name="q6" value="No, I have never used such digital lending apps"><span>No, I have never used such digital lending apps</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q7"><div class="q-label">How many lending apps do you currently have on your phone?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q7" value="1–2"><span>1–2</span></label>
-    <label class="option"><input type="radio" name="q7" value="3–5"><span>3–5</span></label>
-    <label class="option"><input type="radio" name="q7" value="More than 5"><span>More than 5</span></label>
-    <label class="option"><input type="radio" name="q7" value="None"><span>None</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="btn-row"><button class="btn btn-primary" onclick="startInterface()">Continue to loan application →</button><span></span></div>
-</div>
-
-<!-- FINANCIAL LITERACY -->
-<div id="screen-financial" class="screen">
-  <div class="step-info">Step 3 of 6 — Financial Literacy</div>
-  <div class="section-bar">Financial Literacy</div>
-  <div class="section-desc">Answer based on what you know — do not look up answers. There are no penalties for wrong answers.</div>
-
-  <div class="q-card" id="card-q8"><div class="q-label">You put ₹1,00,000 in a savings account at 2% interest per year. How much will be there after one year?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q8" value="₹1,00,020"><span>₹1,00,020</span></label>
-    <label class="option"><input type="radio" name="q8" value="₹1,02,000"><span>₹1,02,000</span></label>
-    <label class="option"><input type="radio" name="q8" value="₹1,20,000"><span>₹1,20,000</span></label>
-    <label class="option"><input type="radio" name="q8" value="₹1,00,200"><span>₹1,00,200</span></label>
-    <label class="option"><input type="radio" name="q8" value="I don't know"><span>I don't know</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q9"><div class="q-label">Your savings account pays 1% interest per year but inflation is 2%. After one year you can buy:<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q9" value="More than today"><span>More than today</span></label>
-    <label class="option"><input type="radio" name="q9" value="Exactly the same"><span>Exactly the same</span></label>
-    <label class="option"><input type="radio" name="q9" value="Less than today"><span>Less than today</span></label>
-    <label class="option"><input type="radio" name="q9" value="Impossible to tell"><span>Impossible to tell</span></label>
-    <label class="option"><input type="radio" name="q9" value="I don't know"><span>I don't know</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q10"><div class="q-label">You have ₹1,00,000 at 10% interest per year. After 5 years you will have:<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q10" value="More than ₹1,50,000"><span>More than ₹1,50,000</span></label>
-    <label class="option"><input type="radio" name="q10" value="Exactly ₹1,50,000"><span>Exactly ₹1,50,000</span></label>
-    <label class="option"><input type="radio" name="q10" value="Less than ₹1,50,000"><span>Less than ₹1,50,000</span></label>
-    <label class="option"><input type="radio" name="q10" value="I don't know"><span>I don't know</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q11"><div class="q-label">Which statement is correct?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q11" value="Buying shares in one company is less risky than a mutual fund"><span>Buying shares in one company is less risky than a mutual fund</span></label>
-    <label class="option"><input type="radio" name="q11" value="A mutual fund is less risky than buying shares in one company"><span>A mutual fund is less risky than buying shares in one company</span></label>
-    <label class="option"><input type="radio" name="q11" value="Both carry the same risk"><span>Both carry the same risk</span></label>
-    <label class="option"><input type="radio" name="q11" value="I don't know"><span>I don't know</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-q12"><div class="q-label">You take ₹60,000 loan repayable in 12 equal monthly instalments at 0% interest. What is your monthly EMI?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="q12" value="₹6,000"><span>₹6,000</span></label>
-    <label class="option"><input type="radio" name="q12" value="₹4,500"><span>₹4,500</span></label>
-    <label class="option"><input type="radio" name="q12" value="₹5,000"><span>₹5,000</span></label>
-    <label class="option"><input type="radio" name="q12" value="₹7,200"><span>₹7,200</span></label>
-    <label class="option"><input type="radio" name="q12" value="I don't know"><span>I don't know</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="btn-row">
-    <button class="btn btn-primary" onclick="goToPressure()" style="margin-left:auto">Next →</button>
-  </div>
-</div>
-
-<!-- PSYCHOLOGICAL PRESSURE -->
-<div id="screen-pressure" class="screen">
-  <div class="step-info">Step 4 of 6 — Your Experience</div>
-  <div class="section-bar">Perceived Psychological Pressure</div>
-  <div class="section-desc">The following statements are about how you felt during the loan application. Please rate how much you agree with each statement. There is no right or wrong answer.</div>
-
-  <div class="q-card" id="card-p1"><div class="q-label">I felt rushed while making my loan decision<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="p1" value="1"><span>1</span></label>
-      <label><input type="radio" name="p1" value="2"><span>2</span></label>
-      <label><input type="radio" name="p1" value="3"><span>3</span></label>
-      <label><input type="radio" name="p1" value="4"><span>4</span></label>
-      <label><input type="radio" name="p1" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-p2"><div class="q-label">I felt pressured to choose a higher loan amount than I originally intended<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="p2" value="1"><span>1</span></label>
-      <label><input type="radio" name="p2" value="2"><span>2</span></label>
-      <label><input type="radio" name="p2" value="3"><span>3</span></label>
-      <label><input type="radio" name="p2" value="4"><span>4</span></label>
-      <label><input type="radio" name="p2" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-p3"><div class="q-label">I felt anxious or stressed at any point during the application<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="p3" value="1"><span>1</span></label>
-      <label><input type="radio" name="p3" value="2"><span>2</span></label>
-      <label><input type="radio" name="p3" value="3"><span>3</span></label>
-      <label><input type="radio" name="p3" value="4"><span>4</span></label>
-      <label><input type="radio" name="p3" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-p4"><div class="q-label">I felt I might miss out on something if I did not act quickly<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="p4" value="1"><span>1</span></label>
-      <label><input type="radio" name="p4" value="2"><span>2</span></label>
-      <label><input type="radio" name="p4" value="3"><span>3</span></label>
-      <label><input type="radio" name="p4" value="4"><span>4</span></label>
-      <label><input type="radio" name="p4" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-p5"><div class="q-label">I felt I had enough time to carefully read all the information before deciding<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="p5" value="1"><span>1</span></label>
-      <label><input type="radio" name="p5" value="2"><span>2</span></label>
-      <label><input type="radio" name="p5" value="3"><span>3</span></label>
-      <label><input type="radio" name="p5" value="4"><span>4</span></label>
-      <label><input type="radio" name="p5" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-p6"><div class="q-label">I felt calm and in control throughout the application process<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly agree</span><div class="likert-opts">
-      <label><input type="radio" name="p6" value="1"><span>1</span></label>
-      <label><input type="radio" name="p6" value="2"><span>2</span></label>
-      <label><input type="radio" name="p6" value="3"><span>3</span></label>
-      <label><input type="radio" name="p6" value="4"><span>4</span></label>
-      <label><input type="radio" name="p6" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly disagree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="btn-row">
-    <button class="btn btn-outline" onclick="showScreen('financial')">← Back</button>
-    <button class="btn btn-primary" onclick="goToConfidence()">Next →</button>
-  </div>
-</div>
-
-<!-- DECISION CONFIDENCE -->
-<div id="screen-confidence" class="screen">
-  <div class="step-info">Step 5 of 6 — Your Experience</div>
-  <div class="section-bar">Decision Confidence</div>
-  <div class="section-desc">Please rate how much you agree with each of the following statements about your experience.<br><br><strong>Scale:</strong> 1 = Strongly disagree · 2 = Disagree · 3 = Neither agree nor disagree · 4 = Agree · 5 = Strongly agree</div>
-
-  <div class="q-card" id="card-d1"><div class="q-label">I am confident I understood the loan terms before I submitted the application<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="d1" value="1"><span>1</span></label>
-      <label><input type="radio" name="d1" value="2"><span>2</span></label>
-      <label><input type="radio" name="d1" value="3"><span>3</span></label>
-      <label><input type="radio" name="d1" value="4"><span>4</span></label>
-      <label><input type="radio" name="d1" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-d2"><div class="q-label">I am satisfied with the loan amount I chose<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="d2" value="1"><span>1</span></label>
-      <label><input type="radio" name="d2" value="2"><span>2</span></label>
-      <label><input type="radio" name="d2" value="3"><span>3</span></label>
-      <label><input type="radio" name="d2" value="4"><span>4</span></label>
-      <label><input type="radio" name="d2" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-d3"><div class="q-label">I felt I had enough information to make a good decision<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="d3" value="1"><span>1</span></label>
-      <label><input type="radio" name="d3" value="2"><span>2</span></label>
-      <label><input type="radio" name="d3" value="3"><span>3</span></label>
-      <label><input type="radio" name="d3" value="4"><span>4</span></label>
-      <label><input type="radio" name="d3" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-d4"><div class="q-label">I am not sure whether I made the right choice<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="d4" value="1"><span>1</span></label>
-      <label><input type="radio" name="d4" value="2"><span>2</span></label>
-      <label><input type="radio" name="d4" value="3"><span>3</span></label>
-      <label><input type="radio" name="d4" value="4"><span>4</span></label>
-      <label><input type="radio" name="d4" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-d5"><div class="q-label">I would want to re-read the loan terms before taking this loan in real life<span class="req"> *</span></div>
-    <div class="likert"><span class="likert-end">Strongly disagree</span><div class="likert-opts">
-      <label><input type="radio" name="d5" value="1"><span>1</span></label>
-      <label><input type="radio" name="d5" value="2"><span>2</span></label>
-      <label><input type="radio" name="d5" value="3"><span>3</span></label>
-      <label><input type="radio" name="d5" value="4"><span>4</span></label>
-      <label><input type="radio" name="d5" value="5"><span>5</span></label>
-    </div><span class="likert-end">Strongly agree</span></div>
-    <div class="error-msg">This question is required.</div></div>
-
-  <div class="btn-row">
-    <button class="btn btn-outline" onclick="showScreen('pressure')">← Back</button>
-    <button class="btn btn-primary" onclick="goToDetection()">Next →</button>
-  </div>
-</div>
-
-<!-- DARK PATTERN DETECTION -->
-<div id="screen-detection" class="screen">
-  <div class="step-info">Step 6 of 6 — Final Questions</div>
-  <div class="section-bar">What You Noticed</div>
-  <div class="section-desc">A few final questions about what you noticed during the application. Please answer honestly — this is not a test.</div>
-
-  <div class="q-card" id="card-x1"><div class="q-label">During the application, did you notice a countdown timer or any indication that an offer was time-limited?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="x1" value="Yes"><span>Yes</span></label>
-    <label class="option"><input type="radio" name="x1" value="No"><span>No</span></label>
-    <label class="option"><input type="radio" name="x1" value="Maybe, but I am not certain"><span>Maybe, but I am not certain</span></label>
-    <label class="option"><input type="radio" name="x1" value="Not sure what this means"><span>Not sure what this means</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-x2"><div class="q-label">Did you see any messages about other users taking loans at the same time (e.g., "X people are viewing this offer right now")?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="x2" value="Yes"><span>Yes</span></label>
-    <label class="option"><input type="radio" name="x2" value="No"><span>No</span></label>
-    <label class="option"><input type="radio" name="x2" value="Maybe, but I am not certain"><span>Maybe, but I am not certain</span></label>
-    <label class="option"><input type="radio" name="x2" value="Not sure what this means"><span>Not sure what this means</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-x3"><div class="q-label">Was a specific loan amount already selected or highlighted when the application loaded?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="x3" value="Yes, a higher amount was already selected"><span>Yes, a higher amount was already selected</span></label>
-    <label class="option"><input type="radio" name="x3" value="Yes, but I am not sure if it was higher or just a default"><span>Yes, but I am not sure if it was higher or just a default</span></label>
-    <label class="option"><input type="radio" name="x3" value="No, I had to choose the amount myself"><span>No, I had to choose the amount myself</span></label>
-    <label class="option"><input type="radio" name="x3" value="I do not remember"><span>I do not remember</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="q-card" id="card-x4"><div class="q-label">How straightforward did you find it to locate the fee and repayment information during the application?<span class="req"> *</span></div><div class="options">
-    <label class="option"><input type="radio" name="x4" value="Very easy — it was clearly displayed"><span>Very easy — it was clearly displayed</span></label>
-    <label class="option"><input type="radio" name="x4" value="Somewhat easy"><span>Somewhat easy</span></label>
-    <label class="option"><input type="radio" name="x4" value="Neutral"><span>Neutral</span></label>
-    <label class="option"><input type="radio" name="x4" value="Somewhat difficult — I had to look for it"><span>Somewhat difficult — I had to look for it</span></label>
-    <label class="option"><input type="radio" name="x4" value="Very difficult — the information was hard to find"><span>Very difficult — the information was hard to find</span></label>
-  </div><div class="error-msg">This question is required.</div></div>
-
-  <div class="btn-row">
-    <button class="btn btn-outline" onclick="showScreen('confidence')">← Back</button>
-    <button class="btn btn-primary" onclick="submitAll()">Submit all responses</button>
-  </div>
-</div>
-
-<!-- SUBMITTING -->
-<div id="screen-submitting" class="screen"><div class="loader-box"><div class="spin"></div><div class="loader-text">Submitting your responses...</div></div></div>
-
-<!-- THANK YOU -->
-<div id="screen-thankyou" class="screen"><div class="thankyou-box"><div class="icon">🙏</div><h2>Thank you for participating!</h2><p>Your responses have been recorded successfully.<br>This study examines how interface design affects financial decision-making.<br><br><strong>Sanjogita R</strong><br>S.P. Jain Institute of Management and Research</p></div></div>
-
-<!-- DECLINED -->
-<div id="screen-declined" class="screen"><div class="thankyou-box"><div class="icon">🙏</div><h2>Thank you for your consideration</h2><p>We respect your decision. You may close this page.</p></div></div>
-
-</div>
+<main id="app"></main>
 
 <script>
+(function () {
+'use strict';
+
 // ============================================================
 // Replace with your deployed Google Apps Script Web App URL
+// >>> SHEET_URL — the ONLY place the Apps Script web app URL is set (the loan screens have none).
+// >>> To go live, swap it for the scholar's deployment URL. See SWITCHING.md.
 var SHEET_URL = "https://script.google.com/macros/s/AKfycbyOLrjNSs7QPSni0tfqzfSDTJaT1VGPJ6OGbaPAQDbgHSIpZP2-7-W11toAtVdiiO2Z/exec";
+var DEMO_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
 // ============================================================
 
-var assignedCondition = null;
-var participantNumber = null;
-var participantId = 'P_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
-var loanData = null;
-var interfaceStartTime = 0;
-var interfaceDuration = 0;
+var translations = JSON.parse(document.getElementById('i18n').textContent);
+var LANGS = ['en', 'hi', 'mr'];
+var lang = 'en';
+try { var saved = sessionStorage.getItem('qr_lang'); if (LANGS.indexOf(saved) > -1) lang = saved; } catch (e) {}
 
-function showScreen(id) {
-  var container = document.querySelector('.container');
-  container.style.opacity = '0';
-  container.style.transition = 'opacity 0.12s ease';
-  setTimeout(function() {
-    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-    document.getElementById('screen-' + id).classList.add('active');
-    window.scrollTo(0,0);
-    container.style.opacity = '1';
-  }, 120);
+function t(key, vars) {
+  var s = translations[lang][key];
+  if (s == null) s = translations.en[key];
+  if (s == null) { console.warn('Missing translation key:', key); s = key; }
+  if (vars) s = s.replace(/\{(\w+)\}/g, function (m, k) { return vars[k] != null ? vars[k] : m; });
+  return s;
 }
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
 
-function handleConsent() {
-  var sel = document.querySelector('input[name="consent"]:checked');
-  var card = document.getElementById('card-consent');
-  if (!sel) { card.classList.add('error'); return; }
-  card.classList.remove('error');
-  if (sel.value === 'no') { showScreen('declined'); return; }
-  showScreen('demographics');
+// ---- Instrument definition. Option values are the stored codes (unchanged from the original
+// survey so the Sheet stays consistent); the visible text comes from `translations`. ----
+var YN = ['Yes', 'No', 'Maybe, but I am not certain', 'Not sure what this means'];
+var Q = {
+  consent: { opts: ['yes', 'no'], err: 'err.consent' },
+  q2: { opts: ['18–24 years', '25–30 years', '31–35 years', '36–40 years', '41–45 years', '45 and above'] },
+  q3: { opts: ['Higher Secondary (12th standard)', 'Undergraduate (BE/B.com/B.Sc/BBA/BA etc)', 'Post Graduate (MBA/MA/M.Sc etc)', 'Doctoral (PhD)'], other: true },
+  q4: { opts: ['Salaried-private sector', 'Salaried-government sector', 'Self employed/Business Owner', 'Student', 'Freelancer', 'Unemployed'], other: true },
+  q5: { opts: ['Below Rs 15000', 'Rs 15000–30000', 'Rs 30001–50000', 'Rs 50001–100000', 'Above Rs 100000', 'Prefer not to say'] },
+  q6: { opts: ['Yes, I have applied successfully and taken the loan', 'Yes, I have applied but not complete the process', 'No, but I have browsed such applications', 'No, I have never used such digital lending apps'] },
+  q7: { opts: ['1–2', '3–5', 'More than 5', 'None'] },
+  q8: { opts: ['₹1,00,020', '₹1,02,000', '₹1,20,000', '₹1,00,200', "I don't know"] },
+  q9: { opts: ['More than today', 'Exactly the same', 'Less than today', 'Impossible to tell', "I don't know"] },
+  q10: { opts: ['More than ₹1,50,000', 'Exactly ₹1,50,000', 'Less than ₹1,50,000', "I don't know"] },
+  q11: { opts: ['Buying shares in one company is less risky than a mutual fund', 'A mutual fund is less risky than buying shares in one company', 'Both carry the same risk', "I don't know"] },
+  q12: { opts: ['₹6,000', '₹4,500', '₹5,000', '₹7,200', "I don't know"] },
+  x1: { opts: YN, textKey: 'yn' },
+  x2: { opts: YN, textKey: 'yn' },
+  x3: { opts: ['Yes, a higher amount was already selected', 'Yes, but I am not sure if it was higher or just a default', 'No, I had to choose the amount myself', 'I do not remember'] },
+  x4: { opts: ['Very easy — it was clearly displayed', 'Somewhat easy', 'Neutral', 'Somewhat difficult — I had to look for it', 'Very difficult — the information was hard to find'] }
+};
+var LIKERT = ['1', '2', '3', '4', '5']; // left to right, 1 = strongly disagree, on every screen size
+var FL_CORRECT = { q8: '₹1,02,000', q9: 'Less than today', q10: 'More than ₹1,50,000', q11: 'A mutual fund is less risky than buying shares in one company', q12: '₹5,000' };
+var TOTAL_STEPS = 6;
+
+// ---- Markup builders (text is filled in by applyI18n) ----
+function T(key, tag, cls, extra) {
+  tag = tag || 'span';
+  return '<' + tag + (cls ? ' class="' + cls + '"' : '') + (extra || '') + ' data-i18n="' + key + '"></' + tag + '>';
 }
+var REQ = '<span class="req" aria-hidden="true">*</span><span class="sr-only" data-i18n="a11y.required"></span>';
+function errEl(id) { return '<p class="error-msg" id="err-' + id + '" hidden></p>'; }
 
-// ---- Condition assignment ----
-function fetchCondition() {
-  if (assignedCondition) return Promise.resolve();
-  if (SHEET_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
-    assignedCondition = Date.now() % 2 === 0 ? 'Control' : 'Treatment';
-    participantNumber = 0;
-    console.warn('Demo mode — condition:', assignedCondition);
-    return Promise.resolve();
-  }
-  return fetch(SHEET_URL + '?action=assign')
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (data.status === 'success') {
-        assignedCondition = data.condition;
-        participantNumber = data.participantNumber;
-      } else { throw new Error(data.message); }
-    })
-    .catch(function(err){
-      console.warn('Assignment failed, using random:', err);
-      assignedCondition = Math.random() < 0.5 ? 'Control' : 'Treatment';
-      participantNumber = -1;
-    });
-}
-
-// ---- Start interface with robust loading ----
-function startInterface() {
-  // Validate demographics first (Q2–Q7)
-  var valid = true, firstErr = null;
-  ['q2','q3','q4','q5','q6','q7'].forEach(function(name) {
-    var card = document.getElementById('card-' + name);
-    var sel = document.querySelector('input[name="'+name+'"]:checked');
-    if (!sel) { card.classList.add('error'); valid = false; if (!firstErr) firstErr = card; }
-    else if (sel.value === 'other') {
-      var f = document.getElementById(name + '-other');
-      if (f && !f.value.trim()) { card.classList.add('error'); valid = false; if (!firstErr) firstErr = card; }
-      else card.classList.remove('error');
-    } else card.classList.remove('error');
+function choiceQ(id) {
+  var q = Q[id], tk = q.textKey || id;
+  var h = '<fieldset class="q" id="card-' + id + '"><legend class="q-label">' + T(id + '.label') + REQ + '</legend><div class="options">';
+  q.opts.forEach(function (v, i) {
+    h += '<label class="option"><input type="radio" name="' + id + '" value="' + esc(v) + '">' + T(tk + '.o' + i) + '</label>';
   });
-  if (!valid && firstErr) { firstErr.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-
-  showScreen('loading');
-
-  fetchCondition()
-    .then(function() { loadIframe(); })
-    .catch(function() {
-      if (!assignedCondition) {
-        assignedCondition = Date.now() % 2 === 0 ? 'Control' : 'Treatment';
-        participantNumber = -1;
-      }
-      loadIframe();
-    });
-
-  // Safety net: if fetch hangs beyond 8s, use random assignment
-  setTimeout(function() {
-    if (!iframeLoaded) {
-      console.warn('Fetch timed out — using random assignment');
-      if (!assignedCondition) {
-        assignedCondition = Date.now() % 2 === 0 ? 'Control' : 'Treatment';
-        participantNumber = -1;
-      }
-      loadIframe();
-    }
-  }, 8000);
+  if (q.other) {
+    h += '<label class="option"><input type="radio" name="' + id + '" value="other">' + T('opt.other') + '</label>' +
+         '<input type="text" class="other-field" id="' + id + '-other" maxlength="200" data-i18n-ph="opt.otherPh" data-i18n-aria="opt.otherPh" hidden>';
+  }
+  return h + '</div>' + errEl(id) + '</fieldset>';
+}
+function likertQ(id) {
+  var h = '<fieldset class="q likert" id="card-' + id + '"><legend class="q-label">' + T(id + '.label') + REQ + '</legend><div class="scale" dir="ltr">';
+  LIKERT.forEach(function (v) {
+    h += '<label class="pt"><input type="radio" name="' + id + '" value="' + v + '"><span class="pt-n">' + v + '</span> ' + T('likert.' + v, 'span', 'sr-only') + '</label>';
+  });
+  return h + '</div><div class="anchors" dir="ltr" aria-hidden="true">' + T('likert.1') + T('likert.5') + '</div>' +
+         '<p class="picked" id="picked-' + id + '" aria-hidden="true"></p>' + errEl(id) + '</fieldset>';
+}
+function actions(back, nextAct, nextKey) {
+  return '<div class="actions">' + (back ? '<button type="button" class="btn ghost" data-go="' + back + '" data-i18n="btn.back"></button>' : '') +
+         '<button type="button" class="btn primary" data-act="' + nextAct + '" data-i18n="' + nextKey + '"></button></div>';
+}
+function screen(id, step, inner) {
+  return '<section class="screen" id="screen-' + id + '" data-step="' + step + '">' + inner + '</section>';
+}
+function statusScreen(id, titleKey, bodyHtml, spin) {
+  return screen(id, 0, '<div class="status">' + (spin ? '<div class="spin" aria-hidden="true"></div>' : '') +
+    (titleKey ? T(titleKey, 'h1', '', ' tabindex="-1"') : '') + bodyHtml + '</div>');
+}
+function section(titleKey, descHtml, body) {
+  return '<div class="sheet">' + T(titleKey, 'h1', '', ' tabindex="-1"') + descHtml + '</div><div class="sheet">' + body + '</div>';
 }
 
-var iframeLoaded = false;
-function loadIframe() {
-  if (iframeLoaded) return;
-  iframeLoaded = true;
-  var src = assignedCondition === 'Treatment'
-    ? 'quickrupee_treatment.html?embedded=true'
-    : 'quickrupee_control.html?embedded=true';
-  var frame = document.getElementById('loanFrame');
-  frame.src = src;
+var DEMO_IDS = ['q2', 'q3', 'q4', 'q5', 'q6', 'q7'];
+var FL_IDS = ['q8', 'q9', 'q10', 'q11', 'q12'];
+var PP_IDS = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+var DC_IDS = ['d1', 'd2', 'd3', 'd4', 'd5'];
+var DP_IDS = ['x1', 'x2', 'x3', 'x4'];
 
-  var shown = false;
-  function show() {
-    if (shown) return;
-    shown = true;
-    interfaceStartTime = Date.now();
-    showScreen('interface');
-  }
-  frame.onload = function() { setTimeout(show, 80); };
-  setTimeout(show, 1500); // fallback if onload doesn't fire
+$('app').innerHTML =
+  screen('consent', 0,
+    '<div class="sheet">' + T('consent.title', 'h1', '', ' tabindex="-1"') + T('consent.intro', 'p', 'lede') + T('req.note', 'p', 'req-note') + '</div>' +
+    '<div class="sheet">' + choiceQ('consent') + '</div>' +
+    '<div class="sheet">' + T('brief.title', 'h2') + T('brief.p1', 'p') + T('brief.important', 'p', 'strong') +
+      '<ul class="checklist">' + T('brief.li1', 'li') + T('brief.li2', 'li') + T('brief.li3', 'li') + '</ul>' + T('brief.p2', 'p') + '</div>' +
+    actions(null, 'consent', 'btn.begin')) +
+  screen('demographics', 1,
+    section('demo.title', T('demo.intro', 'p'), DEMO_IDS.map(choiceQ).join('')) + actions(null, 'toLoan', 'btn.toLoan')) +
+  statusScreen('loading', null, T('loading', 'p') + '<p id="loadingSlow" style="margin-top:12px" data-i18n="loading.slow" hidden></p>' +
+    '<div class="actions" style="justify-content:center;margin-top:20px"><button type="button" class="btn primary" id="retryFrame" style="margin:0" data-act="retryFrame" data-i18n="btn.retry" hidden></button></div>', true) +
+  screen('interface', 2, '<div class="frame-wrap"><iframe id="loanFrame" data-i18n-title="frame.title"></iframe></div>') +
+  screen('financial', 3, section('fl.title', T('fl.desc', 'p'), FL_IDS.map(choiceQ).join('')) + actions(null, 'toPressure', 'btn.next')) +
+  screen('pressure', 4, section('pp.title', T('pp.desc', 'p'), PP_IDS.map(likertQ).join('')) + actions('financial', 'toConfidence', 'btn.next')) +
+  screen('confidence', 5, section('dc.title', T('dc.desc', 'p') +
+      '<p class="strong">' + T('scale.key') + '</p><ul class="scale-key">' +
+      LIKERT.map(function (v) { return '<li>' + v + ' = ' + T('likert.' + v) + '</li>'; }).join('') + '</ul>',
+    DC_IDS.map(likertQ).join('')) + actions('pressure', 'toDetection', 'btn.next')) +
+  screen('detection', 6, section('dp.title', T('dp.desc', 'p'), DP_IDS.map(choiceQ).join('')) + actions('confidence', 'submit', 'btn.submit')) +
+  statusScreen('submitting', null, T('submitting', 'p'), true) +
+  statusScreen('thankyou', 'ty.title', T('ty.body', 'p') + '<p><br><strong data-i18n="ty.name"></strong><br><span data-i18n="ty.inst"></span></p>') +
+  statusScreen('failed', 'fail.title', T('fail.body', 'p') + '<div class="actions" style="justify-content:center;margin-top:20px"><button type="button" class="btn primary" style="margin:0" data-act="retry" data-i18n="btn.retry"></button></div>') +
+  statusScreen('declined', 'declined.title', T('declined.body', 'p'));
+
+$('langNav').innerHTML = LANGS.map(function (l) {
+  return '<button type="button" lang="' + l + '" data-lang="' + l + '">' + esc(translations[l]['lang.name']) + '</button>';
+}).join('');
+
+// ---- i18n ----
+function applyI18n() {
+  document.documentElement.lang = lang;
+  document.title = t('meta.title');
+  document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function (el) { el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(function (el) { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
+  document.querySelectorAll('[data-i18n-title]').forEach(function (el) { el.title = t(el.getAttribute('data-i18n-title')); });
+  document.querySelectorAll('.error-msg[data-key]').forEach(function (el) { el.textContent = t(el.getAttribute('data-key')); });
+  $('langNav').setAttribute('aria-label', t('lang.label'));
+  document.querySelectorAll('#langNav button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
+  PP_IDS.concat(DC_IDS).forEach(refreshPicked);
+  updateProgress();
+}
+function setLang(l) {
+  if (LANGS.indexOf(l) < 0 || l === lang) return;
+  lang = l;
+  try { sessionStorage.setItem('qr_lang', l); } catch (e) {}
+  applyI18n();
+  postLangToFrame();
+}
+function postLangToFrame() {
+  var f = $('loanFrame');
+  if (f && f.contentWindow && f.getAttribute('src')) f.contentWindow.postMessage({ type: 'quickrupee-lang', lang: lang }, '*');
 }
 
-// ---- Listen for iframe messages ----
-window.addEventListener('message', function(event) {
-  if (!event.data || !event.data.type) return;
-  if (event.data.type === 'quickrupee-resize') {
-    document.getElementById('loanFrame').style.height = event.data.height + 'px';
-  }
-  if (event.data.type === 'quickrupee-scroll-top') {
-    document.getElementById('loanFrame').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-  if (event.data.type === 'quickrupee-complete') {
-    loanData = event.data.data;
-    interfaceDuration = Math.round((Date.now() - interfaceStartTime) / 1000);
-    console.log('Loan data received. Duration:', interfaceDuration, 'seconds');
-    setTimeout(function(){ showScreen('financial'); }, 250);
-  }
-});
-
-// ---- Other field toggle ----
-function toggleOther(name) {
-  var f = document.getElementById(name + '-other');
-  if (f) f.disabled = false;
+// ---- Screens & progress ----
+var current = 'consent';
+function updateProgress() {
+  var step = Number($('screen-' + current).getAttribute('data-step'));
+  $('progress').hidden = !step;
+  if (!step) return;
+  $('progressText').textContent = t('progress', { n: step, total: TOTAL_STEPS, name: t('step.' + step) });
+  $('progressFill').style.transform = 'scaleX(' + (step / TOTAL_STEPS) + ')';
 }
-document.addEventListener('change', function(e) {
-  if (e.target.type !== 'radio') return;
-  var name = e.target.name;
-  var f = document.getElementById(name + '-other');
-  if (f) { f.disabled = (e.target.value !== 'other'); if (e.target.value !== 'other') f.value = ''; }
-});
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
+  var el = $('screen-' + id);
+  el.classList.add('active');
+  current = id;
+  updateProgress();
+  window.scrollTo(0, 0);
+  var h = el.querySelector('h1');
+  if (h) h.focus({ preventScroll: true });
+}
 
-// ---- Validation ----
+// ---- Answers ----
+function checked(name) { return document.querySelector('input[name="' + name + '"]:checked'); }
 function getAnswer(name) {
-  var sel = document.querySelector('input[name="'+name+'"]:checked');
+  var sel = checked(name);
   if (!sel) return '';
   if (sel.value === 'other') {
-    var f = document.getElementById(name + '-other');
+    var f = $(name + '-other');
     return f && f.value.trim() ? 'Other: ' + f.value.trim() : 'Other';
   }
   return sel.value;
 }
-
-// ---- Navigation between the new question screens ----
-function validateLikert(names, callback) {
-  var valid = true, firstErr = null;
-  names.forEach(function(name) {
-    var card = document.getElementById('card-' + name);
-    var sel = document.querySelector('input[name="'+name+'"]:checked');
-    if (!sel) { card.classList.add('error'); valid = false; if (!firstErr) firstErr = card; }
-    else card.classList.remove('error');
+function refreshPicked(id) {
+  var p = $('picked-' + id), sel = checked(id);
+  p.textContent = sel ? t('likert.picked', { label: t('likert.' + sel.value), n: sel.value }) : t('likert.hint');
+  p.classList.toggle('on', !!sel);
+}
+function setError(id, key) {
+  var card = $('card-' + id), m = $('err-' + id);
+  card.classList.toggle('error', !!key);
+  if (key) {
+    m.setAttribute('data-key', key); m.textContent = t(key); m.hidden = false;
+    card.setAttribute('aria-describedby', 'err-' + id);
+  } else {
+    m.removeAttribute('data-key'); m.hidden = true;
+    card.removeAttribute('aria-describedby');
+  }
+}
+function errorFor(id) {
+  var sel = checked(id);
+  if (!sel) return Q[id] && Q[id].err ? Q[id].err : 'err.required';
+  if (sel.value === 'other' && !$(id + '-other').value.trim()) return 'err.other';
+  return null;
+}
+function validate(ids) {
+  var first = null;
+  ids.forEach(function (id) {
+    var key = errorFor(id);
+    setError(id, key);
+    if (key && !first) first = { id: id, key: key };
   });
-  if (!valid && firstErr) { firstErr.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-  callback();
+  if (!first) return true;
+  var card = $('card-' + first.id);
+  card.scrollIntoView({ block: 'center' });
+  var target = first.key === 'err.other' ? $(first.id + '-other') : card.querySelector('input');
+  target.focus({ preventScroll: true });
+  return false;
 }
 
-// Financial literacy → Psychological Pressure (validate FL first)
-function goToPressure() {
-  validateLikert(['q8','q9','q10','q11','q12'], function(){ showScreen('pressure'); });
-}
-// Pressure → Confidence
-function goToConfidence() {
-  validateLikert(['p1','p2','p3','p4','p5','p6'], function(){ showScreen('confidence'); });
-}
-// Confidence → Detection
-function goToDetection() {
-  validateLikert(['d1','d2','d3','d4','d5'], function(){ showScreen('detection'); });
-}
+document.addEventListener('change', function (e) {
+  var el = e.target;
+  if (el.type !== 'radio') return;
+  var id = el.name, other = $(id + '-other');
+  if (other) {
+    var on = el.value === 'other';
+    other.hidden = !on; other.disabled = !on;
+    if (on) other.focus(); else other.value = '';
+  }
+  if (/^[pd]\d$/.test(id)) refreshPicked(id);
+  if ($('card-' + id).classList.contains('error') && !errorFor(id)) setError(id, null);
+});
+document.addEventListener('input', function (e) {
+  var m = /^(q\d+)-other$/.exec(e.target.id || '');
+  if (m && $('card-' + m[1]).classList.contains('error') && !errorFor(m[1])) setError(m[1], null);
+});
 
-// ---- Financial literacy scoring ----
-var FL_CORRECT = { q8:'₹1,02,000', q9:'Less than today', q10:'More than ₹1,50,000', q11:'A mutual fund is less risky than buying shares in one company', q12:'₹5,000' };
+// ---- Condition assignment & loan interface ----
+var assignedCondition = null, participantNumber = null;
+var participantId = 'P_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+var loanData = null, interfaceStartTime = 0, interfaceDuration = 0, iframeLoaded = false;
+var assignBusy = false, frameReady = false, wantInterface = false, slowTimer = null;
+var ASSIGN_DELAYS = [0, 1000, 2000, 4000, 8000]; // 5 attempts, then wait for the participant's retry
 
-function submitAll() {
-  // Validate dark-pattern detection questions (final screen)
-  var valid = true, firstErr = null;
-  ['x1','x2','x3','x4'].forEach(function(name) {
-    var card = document.getElementById('card-' + name);
-    var sel = document.querySelector('input[name="'+name+'"]:checked');
-    if (!sel) { card.classList.add('error'); valid = false; if (!firstErr) firstErr = card; }
-    else card.classList.remove('error');
+// Only an OK, parseable JSON reply counts; HTML error pages and HTTP errors are failures.
+function readJson(r) {
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.text().then(function (txt) {
+    try { return JSON.parse(txt); } catch (e) { throw new Error('Not JSON: ' + txt.slice(0, 80)); }
   });
-  if (!valid && firstErr) { firstErr.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+}
 
-  showScreen('submitting');
+// The assign call is slow (Apps Script: ~1.5 s even for a no-op), so it starts as soon as consent is given
+// and runs while the participant answers "About you". The server keys the assignment on participantId,
+// so retrying with the same id can never give this participant a second, different group.
+// There is no random fallback: the participant waits (with a retry button) until the server answers.
+function requestCondition() {
+  if (assignedCondition || assignBusy) return;
+  assignBusy = true;
+  if (SHEET_URL === DEMO_URL) {
+    assignedCondition = Date.now() % 2 === 0 ? 'Control' : 'Treatment';
+    participantNumber = 0;
+    assignBusy = false;
+    loadIframe();
+    return;
+  }
+  var attempt = 0;
+  (function tryOnce() {
+    fetch(SHEET_URL + '?action=assign&pid=' + encodeURIComponent(participantId))
+      .then(readJson)
+      .then(function (data) {
+        if (data.status !== 'success' || (data.condition !== 'Control' && data.condition !== 'Treatment')) {
+          throw new Error(data.message || 'Unexpected reply');
+        }
+        assignedCondition = data.condition;
+        participantNumber = data.participantNumber;
+        assignBusy = false;
+        loadIframe();
+      })
+      .catch(function (err) {
+        console.warn('Assignment attempt ' + (attempt + 1) + ' failed:', err.message);
+        attempt++;
+        if (attempt < ASSIGN_DELAYS.length) setTimeout(tryOnce, ASSIGN_DELAYS[attempt]);
+        else assignBusy = false; // stop here; the retry button starts a new cycle with the same id
+      });
+  })();
+}
+// Consent given: get the condition and preload the matching loan screen while it is still hidden.
+function prepareInterface() { requestCondition(); }
 
+function startInterface() {
+  if (!validate(DEMO_IDS)) return;
+  wantInterface = true;
+  requestCondition(); // no-op while a request is running or once assigned
+  if (frameReady) { revealInterface(); return; }
+  showScreen('loading');
+  armSlowTimer();
+}
+// Still not ready 12 s after Continue: show a message and a retry button (reloads the same condition).
+function armSlowTimer() {
+  clearTimeout(slowTimer);
+  $('loadingSlow').hidden = true; $('retryFrame').hidden = true;
+  slowTimer = setTimeout(function () {
+    if (frameReady) return;
+    $('loadingSlow').hidden = false; $('retryFrame').hidden = false;
+  }, 12000);
+}
+function retryFrame() {
+  if (!assignedCondition) { requestCondition(); armSlowTimer(); return; } // ask again, same participantId
+  frameReady = false;
+  var frame = $('loanFrame');
+  frame.src = frame.getAttribute('src');
+  armSlowTimer();
+}
+function loadIframe() {
+  if (iframeLoaded) return;
+  iframeLoaded = true;
+  var page = assignedCondition === 'Treatment' ? 'quickrupee_treatment.html' : 'quickrupee_control.html';
+  var frame = $('loanFrame');
+  frame.onload = postLangToFrame;
+  frame.src = page + '?embedded=true&lang=' + lang;
+}
+function revealInterface() {
+  clearTimeout(slowTimer);
+  interfaceStartTime = Date.now();
+  showScreen('interface');
+  // The treatment countdown starts now, so a preloaded screen still opens at 09:47.
+  $('loanFrame').contentWindow.postMessage({ type: 'quickrupee-show' }, '*');
+}
+
+window.addEventListener('message', function (event) {
+  var frame = $('loanFrame');
+  if (!frame || event.source !== frame.contentWindow) return; // only trust our own loan iframe
+  var d = event.data;
+  if (!d || !d.type) return;
+  if (d.type === 'quickrupee-resize' && !frameReady) {
+    frameReady = true; // first message from the loan page = it has loaded and is running
+    if (wantInterface && current === 'loading') revealInterface();
+  }
+  if (d.type === 'quickrupee-resize' && d.height > 0 && current === 'interface') frame.style.height = Math.ceil(d.height) + 'px';
+  if (d.type === 'quickrupee-scroll-top') frame.scrollIntoView({ block: 'start' });
+  if (d.type === 'quickrupee-complete') {
+    loanData = d.data;
+    interfaceDuration = Math.round((Date.now() - interfaceStartTime) / 1000);
+    setTimeout(function () { showScreen('financial'); }, 250);
+  }
+});
+
+// ---- Submission ----
+function istTimestamp() {
+  var ist = new Date(Date.now() + 5.5 * 3600 * 1000);
+  function p(n) { return String(n).padStart(2, '0'); }
+  return ist.getUTCFullYear() + '-' + p(ist.getUTCMonth() + 1) + '-' + p(ist.getUTCDate()) + ' ' +
+         p(ist.getUTCHours()) + ':' + p(ist.getUTCMinutes()) + ':' + p(ist.getUTCSeconds()) + ' IST';
+}
+function buildPayload() {
   var flScore = 0, fl = {};
-  ['q8','q9','q10','q11','q12'].forEach(function(name, i) {
-    var ans = getAnswer(name);
-    var correct = (ans === FL_CORRECT[name]) ? 'Yes' : 'No';
-    if (correct === 'Yes') flScore++;
-    fl['fl' + (i+1) + 'Answer'] = ans;
-    fl['fl' + (i+1) + 'Correct'] = correct;
+  FL_IDS.forEach(function (name, i) {
+    var ans = getAnswer(name), ok = ans === FL_CORRECT[name] ? 'Yes' : 'No';
+    if (ok === 'Yes') flScore++;
+    fl['fl' + (i + 1) + 'Answer'] = ans;
+    fl['fl' + (i + 1) + 'Correct'] = ok;
   });
-
-  // Format timestamp in IST (Indian Standard Time)
-  var now = new Date();
-  var istOffset = 5.5 * 60 * 60 * 1000;
-  var ist = new Date(now.getTime() + istOffset);
-  var ts = ist.getUTCFullYear() + '-' + String(ist.getUTCMonth()+1).padStart(2,'0') + '-' + String(ist.getUTCDate()).padStart(2,'0') + ' ' + String(ist.getUTCHours()).padStart(2,'0') + ':' + String(ist.getUTCMinutes()).padStart(2,'0') + ':' + String(ist.getUTCSeconds()).padStart(2,'0') + ' IST';
-
-  // Use the condition from the iframe (what the participant actually saw)
-  // to ensure data always goes to the correct sheet
-  var actualCondition = (loanData && loanData.condition) ? loanData.condition : assignedCondition;
-
+  // Use the condition the participant actually saw (reported by the iframe).
+  var actualCondition = loanData && loanData.condition ? loanData.condition : assignedCondition;
   var payload = {
-    timestamp: ts,
+    timestamp: istTimestamp(),
     participantId: participantId,
     participantNumber: participantNumber || 0,
     condition: actualCondition,
@@ -627,51 +885,79 @@ function submitAll() {
     fl5Answer: fl.fl5Answer, fl5Correct: fl.fl5Correct,
     flScore: flScore,
     interfaceDuration: interfaceDuration,
-    // Perceived Psychological Pressure (6 items)
     pressure1: getAnswer('p1'), pressure2: getAnswer('p2'), pressure3: getAnswer('p3'),
     pressure4: getAnswer('p4'), pressure5: getAnswer('p5'), pressure6: getAnswer('p6'),
-    // Decision Confidence (5 items)
     confidence1: getAnswer('d1'), confidence2: getAnswer('d2'), confidence3: getAnswer('d3'),
     confidence4: getAnswer('d4'), confidence5: getAnswer('d5'),
-    // Dark Pattern Detection (4 items)
     detect1: getAnswer('x1'), detect2: getAnswer('x2'), detect3: getAnswer('x3'), detect4: getAnswer('x4')
   };
-
   if (loanData) {
-    payload.loanAmountRequested = loanData.loanAmountRequested;
-    payload.overborrowingAmount = loanData.overborrowingAmount;
-    payload.tenureSelected = loanData.tenureSelected;
-    payload.insuranceAdded = loanData.insuranceAdded;
-    payload.emiAmount = loanData.emiAmount;
-    payload.totalRepayment = loanData.totalRepayment;
-    payload.decisionConfidence = loanData.decisionConfidence;
-    payload.recallAPR = loanData.recallAPR;
-    payload.recallAPRCorrect = loanData.recallAPRCorrect;
-    payload.recallFee = loanData.recallFee;
-    payload.recallFeeCorrect = loanData.recallFeeCorrect;
-    payload.perceivedFairness = loanData.perceivedFairness;
+    ['loanAmountRequested', 'overborrowingAmount', 'tenureSelected', 'insuranceAdded', 'emiAmount', 'totalRepayment',
+     'decisionConfidence', 'recallAPR', 'recallAPRCorrect', 'recallFee', 'recallFeeCorrect', 'perceivedFairness']
+      .forEach(function (k) { payload[k] = loanData[k]; });
   }
-
-  console.log('FULL PAYLOAD:', JSON.stringify(payload, null, 2));
-
-  if (SHEET_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
-    console.warn('Demo mode — data logged to console only.');
-    showScreen('thankyou');
-    return;
-  }
-
-  // Fire the data off in the background — don't make the participant wait
-  // for Google's response (mode:no-cors means we can't read it anyway).
-  // keepalive ensures the send completes even if the page is closed.
-  fetch(SHEET_URL, {
-    method: 'POST', mode: 'no-cors', keepalive: true,
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
-  }).catch(function(err){ console.error('Submit error:', err); });
-
-  // Show thank-you right away
-  showScreen('thankyou');
+  payload.language = lang; // new field, sent last; language shown when the participant submitted
+  return payload;
 }
+
+var payload = null;
+function submitAll() {
+  if (!validate(DP_IDS)) return;
+  payload = buildPayload(); // built once, so a retry re-sends the identical row (same participantId)
+  send();
+}
+function send() {
+  showScreen('submitting');
+  if (SHEET_URL === DEMO_URL) { console.log('Demo mode — payload:', payload); showScreen('thankyou'); return; }
+  var ctrl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 20000);
+  // The reply is read (text/plain keeps this a simple CORS request, no preflight). Only {"status":"success"}
+  // counts; HTTP errors, HTML error pages and network failures show the retry screen. Retrying is safe:
+  // the server ignores a second row with the same participantId.
+  fetch(SHEET_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    signal: ctrl ? ctrl.signal : undefined
+  }).then(readJson).then(function (data) {
+    if (data.status !== 'success') throw new Error(data.message || 'Unexpected reply');
+    clearTimeout(timer);
+    showScreen('thankyou');
+  }).catch(function (err) {
+    clearTimeout(timer);
+    console.warn('Submit failed:', err);
+    showScreen('failed');
+  });
+}
+
+// ---- Wiring ----
+var ACTIONS = {
+  consent: function () {
+    if (!validate(['consent'])) return;
+    if (checked('consent').value === 'no') { showScreen('declined'); return; }
+    prepareInterface();
+    showScreen('demographics');
+  },
+  toLoan: startInterface,
+  retryFrame: retryFrame,
+  toPressure: function () { if (validate(FL_IDS)) showScreen('pressure'); },
+  toConfidence: function () { if (validate(PP_IDS)) showScreen('confidence'); },
+  toDetection: function () { if (validate(DC_IDS)) showScreen('detection'); },
+  submit: submitAll,
+  retry: send
+};
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('button');
+  if (!b) return;
+  if (b.hasAttribute('data-lang')) setLang(b.getAttribute('data-lang'));
+  else if (b.hasAttribute('data-act')) ACTIONS[b.getAttribute('data-act')]();
+  else if (b.hasAttribute('data-go')) showScreen(b.getAttribute('data-go'));
+});
+
+applyI18n();
+$('screen-consent').classList.add('active');
+updateProgress();
+})();
 </script>
 </body>
 </html>

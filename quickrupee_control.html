@@ -4,9 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuickRupee — Loan Application</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Devanagari fallback only: Latin text keeps the system font, so the English stimulus looks exactly as before. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Devanagari', 'Nirmala UI', 'Kohinoor Devanagari', sans-serif; background: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; }
+  :lang(hi), :lang(mr) { line-height: 1.5; }
   .phone { width: 100%; max-width: 400px; background: #fff; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); overflow: hidden; transition: opacity 0.12s ease; }
   .phone.fading { opacity: 0; }
   .status-bar { background: #1a1a2e; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
@@ -22,10 +26,10 @@
   .progress-fill { height: 4px; background: #1a1a2e; border-radius: 2px; transition: width 0.4s; }
   .kfs-box { margin: 14px; background: #eaf3de; border: 1px solid #c0dd97; border-radius: 10px; padding: 12px; }
   .kfs-title { font-size: 10px; font-weight: 700; color: #3b6d11; margin-bottom: 8px; letter-spacing: 0.8px; text-transform: uppercase; }
-  .kfs-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #c0dd97; }
+  .kfs-row { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid #c0dd97; }
   .kfs-row:last-child { border-bottom: none; }
   .kfs-label { font-size: 12px; color: #555; }
-  .kfs-value { font-size: 12px; font-weight: 600; color: #1a1a2e; }
+  .kfs-value { font-size: 12px; font-weight: 600; color: #1a1a2e; text-align: right; }
   .cooling { font-size: 11px; color: #3b6d11; margin-top: 8px; padding-top: 8px; border-top: 1px solid #c0dd97; line-height: 1.5; }
   .section { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; }
   .section-title { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 10px; }
@@ -38,10 +42,10 @@
   .tenure-opt:hover { border-color: #aaa; }
   .tenure-opt.selected { border-color: #1a1a2e; background: #e6f1fb; color: #1a1a2e; font-weight: 600; }
   .cost-box { margin: 0 14px 14px; background: #f9f9f9; border-radius: 10px; padding: 12px; }
-  .cost-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; }
+  .cost-row { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; }
   .cost-row:last-child { border-bottom: none; font-weight: 600; }
   .cost-label { font-size: 13px; color: #666; }
-  .cost-value { font-size: 13px; color: #1a1a2e; }
+  .cost-value { font-size: 13px; color: #1a1a2e; text-align: right; }
   .insurance-box { margin: 0 14px 14px; border: 1px solid #e8e8e8; border-radius: 10px; padding: 14px; }
   .ins-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
   .ins-icon { width: 32px; height: 32px; border-radius: 8px; background: #e6f1fb; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
@@ -61,71 +65,242 @@
   .confirm-sub { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 20px; }
   .confirm-table { width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 20px; }
   .confirm-table td { padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-  .confirm-table td:last-child { text-align: right; font-weight: 600; color: #1a1a2e; }
+  .confirm-table td:last-child { text-align: right; font-weight: 600; color: #1a1a2e; padding-left: 8px; }
   .confirm-table td:first-child { color: #666; }
   .submit-btn { width: 100%; padding: 15px; background: #1a1a2e; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
   .cancel-btn { width: 100%; padding: 13px; background: transparent; color: #666; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 14px; cursor: pointer; }
   .submitted-screen { display: none; padding: 40px 20px; text-align: center; }
-  .conf-label { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-top: 4px; }
+  .conf-label { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; color: #aaa; margin-top: 4px; }
+  .conf-label span + span { text-align: right; }
   .conf-value { font-size: 20px; font-weight: 700; color: #1a1a2e; text-align: center; margin: 4px 0; }
+  .recall-err { font-size: 13px; font-weight: 600; color: #c0392b; margin: 4px 0 8px; }
   .loading { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.85); align-items: center; justify-content: center; flex-direction: column; gap: 12px; z-index: 999; }
   .loading.active { display: flex; }
   .spinner { width: 36px; height: 36px; border: 3px solid #eee; border-top-color: #1a1a2e; border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media(max-width:440px){body{padding:0;background:#fff;min-height:auto}.phone{border-radius:0;box-shadow:none;max-width:100%}.tenure-opt{padding:14px;font-size:14px;min-height:48px}.cta-btn,.submit-btn,.cancel-btn{padding:16px;font-size:16px;min-height:50px}.checkbox-row input[type=checkbox]{width:20px;height:20px}input[type=range]{height:8px}input[type=text]{padding:12px;font-size:14px}.section{padding:14px 14px}.cost-box,.insurance-box,.kfs-box{margin:12px 10px}}
 </style>
+<script id="i18n" type="application/json">
+{
+"en": {
+  "overlay": "Submitting your application...",
+  "app.sub": "Personal Loan Application",
+  "badge": "RBI Registered",
+  "step1": "Step 1 of 3 — Loan details",
+  "kfs.title": "Key Fact Statement (KFS) — RBI Directions 2025",
+  "kfs.apr": "Annual Percentage Rate (APR)", "kfs.aprVal": "24% p.a.",
+  "kfs.fee": "Processing fee", "kfs.feeVal": "₹500 (upfront)",
+  "kfs.tenure": "Loan tenure", "kfs.tenureVal": "3 – 24 months",
+  "kfs.prepay": "Prepayment charges", "kfs.prepayVal": "Nil",
+  "kfs.cooling": "ℹ️ Cooling-off period: You may cancel this loan within 3 days of disbursement with no penalty — as per RBI Digital Lending Directions, 2025.",
+  "amount.title": "How much do you need to borrow?",
+  "amount.helper": "Adjust this slider to match your actual need. You are not required to borrow the maximum amount.",
+  "tenure.title": "Choose repayment tenure",
+  "months": "{n} months",
+  "cost.title": "Your complete cost summary",
+  "cost.principal": "Principal amount", "cost.apr": "Annual Percentage Rate", "cost.fee": "Processing fee (one-time)",
+  "cost.emi": "Monthly EMI", "cost.total": "Total repayment amount",
+  "ins.title": "Loan protection insurance (optional)",
+  "ins.sub": "Your choice — does not affect loan approval",
+  "ins.price": "₹150/month · Covers job loss & hospitalisation",
+  "ins.yes": "Yes, add insurance to my application",
+  "ins.helper": "Leave unchecked if you do not want insurance. This will not affect your eligibility.",
+  "cta": "Review & continue →",
+  "cta.note": "You may cancel within 3 days of disbursement with no penalty as per RBI regulations.",
+  "step2": "Step 2 of 3 — Review your application",
+  "rev.title": "Review your application",
+  "rev.sub": "Please check all details carefully before submitting. You can go back to make changes.",
+  "rev.amount": "Loan amount", "rev.tenure": "Repayment tenure", "rev.apr": "Annual Percentage Rate", "rev.fee": "Processing fee",
+  "rev.emi": "Monthly EMI", "rev.total": "Total repayment", "rev.ins": "Loan insurance",
+  "rev.insYes": "Yes — ₹150/month", "rev.insNo": "Not selected",
+  "conf.q": "How confident are you in this decision?", "conf.lo": "1 — Not at all", "conf.hi": "10 — Very confident",
+  "btn.submitApp": "✓ Submit application", "btn.goBack": "← Go back and edit",
+  "rev.legal": "By submitting, you confirm you have read and understood all terms above.",
+  "step3": "Step 3 of 3 — Recall questions",
+  "done.title": "Application submitted!",
+  "done.sub": "Please answer 3 quick questions — part of the research study.",
+  "r1": "Q1: What was the Annual Percentage Rate (APR) shown?",
+  "r2": "Q2: What was the processing fee shown?",
+  "r3": "Q3: Did anything about this interface feel unfair or misleading?",
+  "r.ph": "Type your answer here",
+  "fair.lo": "1 — Not at all", "fair.hi": "7 — Very much",
+  "err.recall": "Please answer both recall questions before submitting.",
+  "btn.finish": "Submit answers & finish",
+  "ty.title": "Thank you!",
+  "ty.body": "Your responses have been recorded.<br>Please proceed to the debrief form sent by the researcher.",
+  "almost.title": "Almost done!", "almost.sub": "Loading the next section..."
+},
+"hi": {
+  "overlay": "आपका आवेदन जमा हो रहा है...",
+  "app.sub": "पर्सनल लोन आवेदन",
+  "badge": "RBI में पंजीकृत",
+  "step1": "चरण 1/3 — लोन की जानकारी",
+  "kfs.title": "मुख्य तथ्य विवरण (KFS) — RBI निर्देश 2025",
+  "kfs.apr": "वार्षिक प्रतिशत दर (APR)", "kfs.aprVal": "24% प्रति वर्ष",
+  "kfs.fee": "प्रोसेसिंग फ़ीस", "kfs.feeVal": "₹500 (शुरू में ही)",
+  "kfs.tenure": "लोन की अवधि", "kfs.tenureVal": "3 – 24 महीने",
+  "kfs.prepay": "समय से पहले चुकाने का शुल्क", "kfs.prepayVal": "कोई नहीं",
+  "kfs.cooling": "ℹ️ कूलिंग-ऑफ़ अवधि: RBI के डिजिटल लेंडिंग निर्देश, 2025 के अनुसार, लोन मिलने के 3 दिनों के अंदर आप इसे बिना किसी जुर्माने के रद्द कर सकते हैं।",
+  "amount.title": "आपको कितना लोन चाहिए?",
+  "amount.helper": "इस स्लाइडर को अपनी असली ज़रूरत के हिसाब से सेट करें। ज़्यादा से ज़्यादा रकम लेना ज़रूरी नहीं है।",
+  "tenure.title": "लोन चुकाने की अवधि चुनें",
+  "months": "{n} महीने",
+  "cost.title": "आपके कुल ख़र्च का पूरा ब्योरा",
+  "cost.principal": "मूल रकम", "cost.apr": "वार्षिक प्रतिशत दर", "cost.fee": "प्रोसेसिंग फ़ीस (एक बार)",
+  "cost.emi": "मासिक EMI", "cost.total": "कुल चुकाने वाली रकम",
+  "ins.title": "लोन सुरक्षा बीमा (वैकल्पिक)",
+  "ins.sub": "आपकी मर्ज़ी — इससे लोन की मंज़ूरी पर कोई असर नहीं पड़ता",
+  "ins.price": "₹150/महीना · नौकरी जाने और अस्पताल में भर्ती होने पर कवर",
+  "ins.yes": "हाँ, मेरे आवेदन में बीमा जोड़ें",
+  "ins.helper": "अगर आपको बीमा नहीं चाहिए, तो इसे टिक न करें। इससे आपकी पात्रता पर कोई असर नहीं पड़ेगा।",
+  "cta": "जाँचें और आगे बढ़ें →",
+  "cta.note": "RBI नियमों के अनुसार, लोन मिलने के 3 दिनों के अंदर आप बिना जुर्माने के इसे रद्द कर सकते हैं।",
+  "step2": "चरण 2/3 — अपना आवेदन जाँचें",
+  "rev.title": "अपना आवेदन जाँचें",
+  "rev.sub": "जमा करने से पहले सारी जानकारी ध्यान से जाँच लें। बदलाव करने के लिए आप वापस जा सकते हैं।",
+  "rev.amount": "लोन की रकम", "rev.tenure": "चुकाने की अवधि", "rev.apr": "वार्षिक प्रतिशत दर", "rev.fee": "प्रोसेसिंग फ़ीस",
+  "rev.emi": "मासिक EMI", "rev.total": "कुल चुकाने वाली रकम", "rev.ins": "लोन बीमा",
+  "rev.insYes": "हाँ — ₹150/महीना", "rev.insNo": "नहीं चुना",
+  "conf.q": "इस फ़ैसले पर आपको कितना भरोसा है?", "conf.lo": "1 — बिल्कुल नहीं", "conf.hi": "10 — पूरा भरोसा",
+  "btn.submitApp": "✓ आवेदन जमा करें", "btn.goBack": "← वापस जाकर बदलें",
+  "rev.legal": "जमा करके आप पुष्टि करते हैं कि आपने ऊपर दी गई सभी शर्तें पढ़ और समझ ली हैं।",
+  "step3": "चरण 3/3 — याद से जुड़े सवाल",
+  "done.title": "आवेदन जमा हो गया!",
+  "done.sub": "कृपया 3 छोटे सवालों के जवाब दें — यह शोध अध्ययन का हिस्सा है।",
+  "r1": "प्रश्न 1: कौन-सी वार्षिक प्रतिशत दर (APR) दिखाई गई थी?",
+  "r2": "प्रश्न 2: कितनी प्रोसेसिंग फ़ीस दिखाई गई थी?",
+  "r3": "प्रश्न 3: क्या इस स्क्रीन में कुछ भी अनुचित या गुमराह करने वाला लगा?",
+  "r.ph": "अपना जवाब यहाँ लिखें",
+  "fair.lo": "1 — बिल्कुल नहीं", "fair.hi": "7 — बहुत ज़्यादा",
+  "err.recall": "जमा करने से पहले कृपया दोनों सवालों के जवाब दें।",
+  "btn.finish": "जवाब जमा करें और ख़त्म करें",
+  "ty.title": "धन्यवाद!",
+  "ty.body": "आपके जवाब दर्ज हो गए हैं।<br>कृपया शोधकर्ता द्वारा भेजे गए डीब्रीफ़ फ़ॉर्म पर जाएँ।",
+  "almost.title": "बस, लगभग हो गया!", "almost.sub": "अगला हिस्सा खुल रहा है..."
+},
+"mr": {
+  "overlay": "तुमचा अर्ज सबमिट होत आहे...",
+  "app.sub": "वैयक्तिक कर्ज अर्ज",
+  "badge": "RBI नोंदणीकृत",
+  "step1": "टप्पा 1/3 — कर्जाचा तपशील",
+  "kfs.title": "मुख्य तथ्य विवरण (KFS) — RBI निर्देश 2025",
+  "kfs.apr": "वार्षिक टक्केवारी दर (APR)", "kfs.aprVal": "24% प्रतिवर्ष",
+  "kfs.fee": "प्रोसेसिंग फी", "kfs.feeVal": "₹500 (आगाऊ)",
+  "kfs.tenure": "कर्जाचा कालावधी", "kfs.tenureVal": "3 – 24 महिने",
+  "kfs.prepay": "मुदतपूर्व परतफेड शुल्क", "kfs.prepayVal": "शून्य",
+  "kfs.cooling": "ℹ️ कूलिंग-ऑफ कालावधी: RBI च्या डिजिटल कर्ज निर्देश, 2025 नुसार, कर्ज मिळाल्यापासून 3 दिवसांच्या आत तुम्ही कोणत्याही दंडाशिवाय ते रद्द करू शकता.",
+  "amount.title": "तुम्हाला किती कर्ज हवे आहे?",
+  "amount.helper": "हा स्लायडर तुमच्या खऱ्या गरजेनुसार सेट करा. जास्तीत जास्त रक्कम घेणे आवश्यक नाही.",
+  "tenure.title": "परतफेडीचा कालावधी निवडा",
+  "months": "{n} महिने",
+  "cost.title": "तुमच्या एकूण खर्चाचा संपूर्ण तपशील",
+  "cost.principal": "मूळ रक्कम", "cost.apr": "वार्षिक टक्केवारी दर", "cost.fee": "प्रोसेसिंग फी (एकदाच)",
+  "cost.emi": "मासिक EMI", "cost.total": "एकूण परतफेडीची रक्कम",
+  "ins.title": "कर्ज संरक्षण विमा (ऐच्छिक)",
+  "ins.sub": "तुमची निवड — याचा कर्ज मंजुरीवर परिणाम होत नाही",
+  "ins.price": "₹150/महिना · नोकरी गेल्यास आणि रुग्णालयात दाखल झाल्यास संरक्षण",
+  "ins.yes": "होय, माझ्या अर्जात विमा जोडा",
+  "ins.helper": "तुम्हाला विमा नको असल्यास यावर टिक करू नका. याचा तुमच्या पात्रतेवर परिणाम होणार नाही.",
+  "cta": "तपासा आणि पुढे जा →",
+  "cta.note": "RBI नियमांनुसार, कर्ज मिळाल्यापासून 3 दिवसांच्या आत तुम्ही दंडाशिवाय ते रद्द करू शकता.",
+  "step2": "टप्पा 2/3 — तुमचा अर्ज तपासा",
+  "rev.title": "तुमचा अर्ज तपासा",
+  "rev.sub": "सबमिट करण्यापूर्वी सर्व तपशील काळजीपूर्वक तपासा. बदल करण्यासाठी तुम्ही मागे जाऊ शकता.",
+  "rev.amount": "कर्जाची रक्कम", "rev.tenure": "परतफेडीचा कालावधी", "rev.apr": "वार्षिक टक्केवारी दर", "rev.fee": "प्रोसेसिंग फी",
+  "rev.emi": "मासिक EMI", "rev.total": "एकूण परतफेड", "rev.ins": "कर्ज विमा",
+  "rev.insYes": "होय — ₹150/महिना", "rev.insNo": "निवडला नाही",
+  "conf.q": "या निर्णयाबद्दल तुम्हाला किती खात्री आहे?", "conf.lo": "1 — अजिबात नाही", "conf.hi": "10 — पूर्ण खात्री",
+  "btn.submitApp": "✓ अर्ज सबमिट करा", "btn.goBack": "← मागे जाऊन बदला",
+  "rev.legal": "सबमिट करून तुम्ही खात्री देता की तुम्ही वरील सर्व अटी वाचल्या आणि समजून घेतल्या आहेत.",
+  "step3": "टप्पा 3/3 — आठवणीवर आधारित प्रश्न",
+  "done.title": "अर्ज सबमिट झाला!",
+  "done.sub": "कृपया 3 छोट्या प्रश्नांची उत्तरे द्या — हा संशोधन अभ्यासाचा भाग आहे.",
+  "r1": "प्रश्न 1: कोणता वार्षिक टक्केवारी दर (APR) दाखवला होता?",
+  "r2": "प्रश्न 2: किती प्रोसेसिंग फी दाखवली होती?",
+  "r3": "प्रश्न 3: या स्क्रीनमधील काही अन्यायकारक किंवा दिशाभूल करणारे वाटले का?",
+  "r.ph": "तुमचे उत्तर येथे लिहा",
+  "fair.lo": "1 — अजिबात नाही", "fair.hi": "7 — खूप जास्त",
+  "err.recall": "सबमिट करण्यापूर्वी कृपया दोन्ही प्रश्नांची उत्तरे द्या.",
+  "btn.finish": "उत्तरे सबमिट करा आणि पूर्ण करा",
+  "ty.title": "धन्यवाद!",
+  "ty.body": "तुमची उत्तरे नोंदवली गेली आहेत.<br>कृपया संशोधकाने पाठवलेल्या डीब्रीफ फॉर्मकडे जा.",
+  "almost.title": "जवळपास पूर्ण झाले!", "almost.sub": "पुढील विभाग उघडत आहे..."
+}
+}
+</script>
 </head>
 <body>
-<div class="loading" id="loadingOverlay"><div class="spinner"></div><span style="font-size:13px;color:#888">Submitting your application...</span></div>
+<div class="loading" id="loadingOverlay"><div class="spinner"></div><span style="font-size:13px;color:#888" data-i18n="overlay"></span></div>
 
 <div class="phone">
   <div class="status-bar"><span id="liveClock">--:--</span><span>quickrupee.in 🔒</span><span></span></div>
 
   <div id="mainScreen">
-    <div class="app-header"><div class="logo">QR</div><div><div class="app-name">QuickRupee</div><div class="app-sub">Personal Loan Application</div></div><span class="badge-rbi">RBI Registered</span></div>
-    <div class="progress-bar"><div class="progress-label">Step 1 of 3 — Loan details</div><div class="progress-track"><div class="progress-fill" style="width:33%"></div></div></div>
+    <div class="app-header"><div class="logo">QR</div><div><div class="app-name">QuickRupee</div><div class="app-sub" data-i18n="app.sub"></div></div><span class="badge-rbi" data-i18n="badge"></span></div>
+    <div class="progress-bar"><div class="progress-label" data-i18n="step1"></div><div class="progress-track"><div class="progress-fill" style="width:33%"></div></div></div>
     <div class="kfs-box">
-      <div class="kfs-title">Key Fact Statement (KFS) — RBI Directions 2025</div>
-      <div class="kfs-row"><span class="kfs-label">Annual Percentage Rate (APR)</span><span class="kfs-value">24% p.a.</span></div>
-      <div class="kfs-row"><span class="kfs-label">Processing fee</span><span class="kfs-value">₹500 (upfront)</span></div>
-      <div class="kfs-row"><span class="kfs-label">Loan tenure</span><span class="kfs-value">3 – 24 months</span></div>
-      <div class="kfs-row"><span class="kfs-label">Prepayment charges</span><span class="kfs-value">Nil</span></div>
-      <div class="cooling">ℹ️ Cooling-off period: You may cancel this loan within 3 days of disbursement with no penalty — as per RBI Digital Lending Directions, 2025.</div>
+      <div class="kfs-title" data-i18n="kfs.title"></div>
+      <div class="kfs-row"><span class="kfs-label" data-i18n="kfs.apr"></span><span class="kfs-value" data-i18n="kfs.aprVal"></span></div>
+      <div class="kfs-row"><span class="kfs-label" data-i18n="kfs.fee"></span><span class="kfs-value" data-i18n="kfs.feeVal"></span></div>
+      <div class="kfs-row"><span class="kfs-label" data-i18n="kfs.tenure"></span><span class="kfs-value" data-i18n="kfs.tenureVal"></span></div>
+      <div class="kfs-row"><span class="kfs-label" data-i18n="kfs.prepay"></span><span class="kfs-value" data-i18n="kfs.prepayVal"></span></div>
+      <div class="cooling" data-i18n="kfs.cooling"></div>
     </div>
-    <div class="section"><div class="section-title">How much do you need to borrow?</div><div class="amount-display" id="amountDisplay">₹20,000</div><input type="range" id="loanSlider" min="10000" max="100000" step="5000" value="20000" oninput="updateLoan()"><div class="range-labels"><span>₹10,000</span><span>₹1,00,000</span></div><div class="helper">Adjust this slider to match your actual need. You are not required to borrow the maximum amount.</div></div>
-    <div class="section"><div class="section-title">Choose repayment tenure</div><div class="tenure-grid"><div class="tenure-opt" onclick="selectTenure(this,3)">3 months</div><div class="tenure-opt selected" onclick="selectTenure(this,12)">12 months</div><div class="tenure-opt" onclick="selectTenure(this,18)">18 months</div><div class="tenure-opt" onclick="selectTenure(this,24)">24 months</div></div></div>
-    <div class="cost-box"><div class="section-title" style="margin-bottom:8px">Your complete cost summary</div><div class="cost-row"><span class="cost-label">Principal amount</span><span class="cost-value" id="c-principal">₹20,000</span></div><div class="cost-row"><span class="cost-label">Annual Percentage Rate</span><span class="cost-value">24% p.a.</span></div><div class="cost-row"><span class="cost-label">Processing fee (one-time)</span><span class="cost-value">₹500</span></div><div class="cost-row"><span class="cost-label">Monthly EMI</span><span class="cost-value" id="c-emi">₹1,858</span></div><div class="cost-row"><span class="cost-label">Total repayment amount</span><span class="cost-value" id="c-total">₹22,796</span></div></div>
-    <div class="insurance-box"><div class="ins-header"><div class="ins-icon">🛡️</div><div><div class="ins-title">Loan protection insurance (optional)</div><div class="ins-sub">Your choice — does not affect loan approval</div></div></div><div class="ins-price">₹150/month · Covers job loss & hospitalisation</div><label class="checkbox-row"><input type="checkbox" id="insuranceCheck"><span class="checkbox-label">Yes, add insurance to my application</span></label><div class="helper">Leave unchecked if you do not want insurance. This will not affect your eligibility.</div></div>
-    <div class="cta-area"><button class="cta-btn" onclick="goToConfirm()">Review & continue →</button><div class="cta-note">You may cancel within 3 days of disbursement with no penalty as per RBI regulations.</div></div>
+    <div class="section"><div class="section-title" data-i18n="amount.title"></div><div class="amount-display" id="amountDisplay">₹20,000</div><input type="range" id="loanSlider" min="10000" max="100000" step="5000" value="20000" oninput="updateLoan()"><div class="range-labels"><span>₹10,000</span><span>₹1,00,000</span></div><div class="helper" data-i18n="amount.helper"></div></div>
+    <div class="section"><div class="section-title" data-i18n="tenure.title"></div><div class="tenure-grid"><div class="tenure-opt" data-months="3" onclick="selectTenure(this,3)"></div><div class="tenure-opt selected" data-months="12" onclick="selectTenure(this,12)"></div><div class="tenure-opt" data-months="18" onclick="selectTenure(this,18)"></div><div class="tenure-opt" data-months="24" onclick="selectTenure(this,24)"></div></div></div>
+    <div class="cost-box"><div class="section-title" style="margin-bottom:8px" data-i18n="cost.title"></div><div class="cost-row"><span class="cost-label" data-i18n="cost.principal"></span><span class="cost-value" id="c-principal">₹20,000</span></div><div class="cost-row"><span class="cost-label" data-i18n="cost.apr"></span><span class="cost-value" data-i18n="kfs.aprVal"></span></div><div class="cost-row"><span class="cost-label" data-i18n="cost.fee"></span><span class="cost-value">₹500</span></div><div class="cost-row"><span class="cost-label" data-i18n="cost.emi"></span><span class="cost-value" id="c-emi">₹1,858</span></div><div class="cost-row"><span class="cost-label" data-i18n="cost.total"></span><span class="cost-value" id="c-total">₹22,796</span></div></div>
+    <div class="insurance-box"><div class="ins-header"><div class="ins-icon">🛡️</div><div><div class="ins-title" data-i18n="ins.title"></div><div class="ins-sub" data-i18n="ins.sub"></div></div></div><div class="ins-price" data-i18n="ins.price"></div><label class="checkbox-row"><input type="checkbox" id="insuranceCheck"><span class="checkbox-label" data-i18n="ins.yes"></span></label><div class="helper" data-i18n="ins.helper"></div></div>
+    <div class="cta-area"><button class="cta-btn" onclick="goToConfirm()" data-i18n="cta"></button><div class="cta-note" data-i18n="cta.note"></div></div>
   </div>
 
   <div class="confirm-screen" id="confirmScreen">
-    <div class="progress-bar" style="text-align:left;padding:10px 0 14px"><div class="progress-label">Step 2 of 3 — Review your application</div><div class="progress-track"><div class="progress-fill" style="width:66%"></div></div></div>
-    <div class="confirm-icon">📋</div><div class="confirm-title">Review your application</div><div class="confirm-sub">Please check all details carefully before submitting. You can go back to make changes.</div>
-    <table class="confirm-table"><tr><td>Loan amount</td><td id="rev-amount">₹20,000</td></tr><tr><td>Repayment tenure</td><td id="rev-tenure">12 months</td></tr><tr><td>Annual Percentage Rate</td><td>24% p.a.</td></tr><tr><td>Processing fee</td><td>₹500</td></tr><tr><td>Monthly EMI</td><td id="rev-emi">₹1,858</td></tr><tr><td>Total repayment</td><td id="rev-total">₹22,796</td></tr><tr><td>Loan insurance</td><td id="rev-ins">Not selected</td></tr></table>
-    <div class="section" style="border:none;padding:0 0 16px;text-align:left"><div class="section-title">How confident are you in this decision?</div><div class="conf-value" id="confValue">5</div><input type="range" id="confidenceSlider" min="1" max="10" value="5" oninput="document.getElementById('confValue').textContent=this.value" style="width:100%"><div class="conf-label"><span>1 — Not at all</span><span>10 — Very confident</span></div></div>
-    <button class="submit-btn" onclick="submitApplication()">✓ Submit application</button><button class="cancel-btn" onclick="goBack()">← Go back and edit</button>
-    <div style="font-size:11px;color:#888;margin-top:12px;line-height:1.5">By submitting, you confirm you have read and understood all terms above.</div>
+    <div class="progress-bar" style="text-align:left;padding:10px 0 14px"><div class="progress-label" data-i18n="step2"></div><div class="progress-track"><div class="progress-fill" style="width:66%"></div></div></div>
+    <div class="confirm-icon">📋</div><div class="confirm-title" data-i18n="rev.title"></div><div class="confirm-sub" data-i18n="rev.sub"></div>
+    <table class="confirm-table"><tr><td data-i18n="rev.amount"></td><td id="rev-amount">₹20,000</td></tr><tr><td data-i18n="rev.tenure"></td><td id="rev-tenure"></td></tr><tr><td data-i18n="rev.apr"></td><td data-i18n="kfs.aprVal"></td></tr><tr><td data-i18n="rev.fee"></td><td>₹500</td></tr><tr><td data-i18n="rev.emi"></td><td id="rev-emi">₹1,858</td></tr><tr><td data-i18n="rev.total"></td><td id="rev-total">₹22,796</td></tr><tr><td data-i18n="rev.ins"></td><td id="rev-ins"></td></tr></table>
+    <div class="section" style="border:none;padding:0 0 16px;text-align:left"><div class="section-title" data-i18n="conf.q"></div><div class="conf-value" id="confValue">5</div><input type="range" id="confidenceSlider" min="1" max="10" value="5" oninput="document.getElementById('confValue').textContent=this.value" style="width:100%"><div class="conf-label"><span data-i18n="conf.lo"></span><span data-i18n="conf.hi"></span></div></div>
+    <button class="submit-btn" onclick="submitApplication()" data-i18n="btn.submitApp"></button><button class="cancel-btn" onclick="goBack()" data-i18n="btn.goBack"></button>
+    <div style="font-size:11px;color:#888;margin-top:12px;line-height:1.5" data-i18n="rev.legal"></div>
   </div>
 
   <div class="submitted-screen" id="submittedScreen">
-    <div class="progress-bar" style="text-align:left;padding:10px 0 14px"><div class="progress-label">Step 3 of 3 — Recall questions</div><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>
-    <div style="font-size:56px;margin-bottom:16px">✅</div><div style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:8px">Application submitted!</div><div style="font-size:13px;color:#666;margin-bottom:20px">Please answer 3 quick questions — part of the research study.</div>
+    <div class="progress-bar" style="text-align:left;padding:10px 0 14px"><div class="progress-label" data-i18n="step3"></div><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>
+    <div style="font-size:56px;margin-bottom:16px">✅</div><div style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:8px" data-i18n="done.title"></div><div style="font-size:13px;color:#666;margin-bottom:20px" data-i18n="done.sub"></div>
     <div style="text-align:left">
-      <div class="section" style="border:1px solid #f0f0f0;border-radius:10px;margin-bottom:10px;padding:14px"><div class="section-title">Q1: What was the Annual Percentage Rate (APR) shown?</div><input type="text" id="recall-apr" placeholder="Type your answer here" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:6px"></div>
-      <div class="section" style="border:1px solid #f0f0f0;border-radius:10px;margin-bottom:10px;padding:14px"><div class="section-title">Q2: What was the processing fee shown?</div><input type="text" id="recall-fee" placeholder="Type your answer here" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:6px"></div>
-      <div class="section" style="border:1px solid #f0f0f0;border-radius:10px;margin-bottom:10px;padding:14px"><div class="section-title">Q3: Did anything about this interface feel unfair or misleading?</div><input type="range" id="fairnessSlider" min="1" max="7" value="1" style="width:100%;margin-top:8px"><div class="conf-label"><span>1 — Not at all</span><span>7 — Very much</span></div></div>
-      <button class="submit-btn" onclick="submitRecall()" style="margin-top:8px">Submit answers & finish</button>
+      <div class="section" style="border:1px solid #f0f0f0;border-radius:10px;margin-bottom:10px;padding:14px"><label class="section-title" for="recall-apr" style="display:block" data-i18n="r1"></label><input type="text" id="recall-apr" data-i18n-ph="r.ph" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:6px"></div>
+      <div class="section" style="border:1px solid #f0f0f0;border-radius:10px;margin-bottom:10px;padding:14px"><label class="section-title" for="recall-fee" style="display:block" data-i18n="r2"></label><input type="text" id="recall-fee" data-i18n-ph="r.ph" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-top:6px"></div>
+      <div class="section" style="border:1px solid #f0f0f0;border-radius:10px;margin-bottom:10px;padding:14px"><label class="section-title" for="fairnessSlider" style="display:block" data-i18n="r3"></label><input type="range" id="fairnessSlider" min="1" max="7" value="1" style="width:100%;margin-top:8px"><div class="conf-label"><span data-i18n="fair.lo"></span><span data-i18n="fair.hi"></span></div></div>
+      <p class="recall-err" id="recallErr" role="alert" data-i18n="err.recall" hidden></p>
+      <button class="submit-btn" onclick="submitRecall()" style="margin-top:8px" data-i18n="btn.finish"></button>
     </div>
   </div>
 
-  <div id="thankYouScreen" style="display:none;padding:50px 20px;text-align:center"><div style="font-size:56px;margin-bottom:16px">🙏</div><div style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:10px">Thank you!</div><div style="font-size:13px;color:#666;line-height:1.7">Your responses have been recorded.<br>Please proceed to the debrief form sent by the researcher.</div></div>
+  <div id="thankYouScreen" style="display:none;padding:50px 20px;text-align:center"><div style="font-size:56px;margin-bottom:16px">🙏</div><div style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:10px" data-i18n="ty.title"></div><div style="font-size:13px;color:#666;line-height:1.7" data-i18n-html="ty.body"></div></div>
 </div>
 
 <script>
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyOLrjNSs7QPSni0tfqzfSDTJaT1VGPJ6OGbaPAQDbgHSIpZP2-7-W11toAtVdiiO2Z/exec";
 const CONDITION = "Control";
 let loanAmount = 20000, tenure = 12, insurance = false;
+
+// ---- Language: ?lang=en|hi|mr, or a message from the survey page ----
+var I18N = JSON.parse(document.getElementById('i18n').textContent);
+var lang = (function(){ var l = new URLSearchParams(location.search).get('lang'); return I18N[l] ? l : 'en'; })();
+function t(k, v){ var s = I18N[lang][k]; if (s == null) s = I18N.en[k]; if (s == null) s = k; return v ? s.replace(/\{(\w+)\}/g, function(m, x){ return v[x] != null ? v[x] : m; }) : s; }
+function applyI18n(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){ el.innerHTML = t(el.getAttribute('data-i18n-html')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('.tenure-opt').forEach(function(el){ el.textContent = t('months', { n: el.getAttribute('data-months') }); });
+  document.getElementById('rev-tenure').textContent = t('months', { n: tenure });
+  document.getElementById('rev-ins').textContent = insurance ? t('rev.insYes') : t('rev.insNo');
+}
+window.addEventListener('message', function(e){
+  if (e.source !== window.parent || !e.data || e.data.type !== 'quickrupee-lang' || !I18N[e.data.lang]) return;
+  lang = e.data.lang; applyI18n();
+});
+// Typed answers may use Devanagari digits (२४); score them the same as 24.
+function normDigits(s){ return s.replace(/[०-९]/g, function(d){ return String(d.charCodeAt(0) - 0x0966); }); }
+function recallMissing(a, f){ var err = document.getElementById('recallErr'); err.hidden = !!(a && f); return !(a && f); }
 
 function updateClock(){var n=new Date(),h=n.getHours()%12||12;document.getElementById('liveClock').textContent=h+':'+String(n.getMinutes()).padStart(2,'0');}
 updateClock();setInterval(updateClock,10000);
@@ -136,18 +311,18 @@ function updateLoan(){loanAmount=parseInt(document.getElementById('loanSlider').
 function selectTenure(el,m){document.querySelectorAll('.tenure-opt').forEach(function(o){o.classList.remove('selected')});el.classList.add('selected');tenure=m;updateLoan();}
 // Morph transition between screens
 function morphTo(hideId,showId){var phone=document.querySelector('.phone');phone.classList.add('fading');setTimeout(function(){document.getElementById(hideId).style.display='none';document.getElementById(showId).style.display='block';phone.classList.remove("fading");window.scrollTo(0,0);},120);}
-function goToConfirm(){insurance=document.getElementById('insuranceCheck').checked;var e=calcEMI(loanAmount,tenure),t=e*tenure+500;document.getElementById('rev-amount').textContent=fmt(loanAmount);document.getElementById('rev-tenure').textContent=tenure+' months';document.getElementById('rev-emi').textContent=fmt(e);document.getElementById('rev-total').textContent=fmt(t);document.getElementById('rev-ins').textContent=insurance?'Yes — ₹150/month':'Not selected';morphTo('mainScreen','confirmScreen');}
+function goToConfirm(){insurance=document.getElementById('insuranceCheck').checked;var e=calcEMI(loanAmount,tenure),tot=e*tenure+500;document.getElementById('rev-amount').textContent=fmt(loanAmount);document.getElementById('rev-tenure').textContent=t('months',{n:tenure});document.getElementById('rev-emi').textContent=fmt(e);document.getElementById('rev-total').textContent=fmt(tot);document.getElementById('rev-ins').textContent=insurance?t('rev.insYes'):t('rev.insNo');morphTo('mainScreen','confirmScreen');}
 function goBack(){morphTo('confirmScreen','mainScreen');}
 function submitApplication(){morphTo('confirmScreen','submittedScreen');}
 
 function submitRecall(){
   var confidence=document.getElementById('confidenceSlider').value,recallAPR=document.getElementById('recall-apr').value.trim(),recallFee=document.getElementById('recall-fee').value.trim(),fairness=document.getElementById('fairnessSlider').value,emi=calcEMI(loanAmount,tenure),total=emi*tenure+500;
-  if(!recallAPR||!recallFee){alert('Please answer both recall questions before submitting.');return;}
-  var payload={timestamp:new Date().toISOString(),participantId:'P_'+Date.now(),condition:CONDITION,loanAmountRequested:loanAmount,overborrowingAmount:loanAmount-20000,tenureSelected:tenure,insuranceAdded:insurance?'Yes':'No',emiAmount:emi,totalRepayment:total,decisionConfidence:confidence,recallAPR:recallAPR,recallAPRCorrect:recallAPR.includes('24')?'Correct':'Incorrect',recallFee:recallFee,recallFeeCorrect:recallFee.includes('500')?'Correct':'Incorrect',perceivedFairness:fairness};
+  if(recallMissing(recallAPR,recallFee))return;
+  var payload={timestamp:new Date().toISOString(),participantId:'P_'+Date.now(),condition:CONDITION,loanAmountRequested:loanAmount,overborrowingAmount:loanAmount-20000,tenureSelected:tenure,insuranceAdded:insurance?'Yes':'No',emiAmount:emi,totalRepayment:total,decisionConfidence:confidence,recallAPR:recallAPR,recallAPRCorrect:normDigits(recallAPR).includes('24')?'Correct':'Incorrect',recallFee:recallFee,recallFeeCorrect:normDigits(recallFee).includes('500')?'Correct':'Incorrect',perceivedFairness:fairness};
   console.log("DATA:",JSON.stringify(payload,null,2));
   document.getElementById('loadingOverlay').classList.add('active');
-  if(SHEET_URL==="YOUR_GOOGLE_APPS_SCRIPT_URL_HERE"){setTimeout(function(){document.getElementById('loadingOverlay').classList.remove('active');document.getElementById('submittedScreen').style.display='none';document.getElementById('thankYouScreen').style.display='block';window.scrollTo(0,0);},1200);return;}
-  fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).finally(function(){document.getElementById('loadingOverlay').classList.remove('active');document.getElementById('submittedScreen').style.display='none';document.getElementById('thankYouScreen').style.display='block';window.scrollTo(0,0);});
+  // Standalone preview only: nothing is sent. Survey data is sent by index.html.
+  setTimeout(function(){document.getElementById('loadingOverlay').classList.remove('active');document.getElementById('submittedScreen').style.display='none';document.getElementById('thankYouScreen').style.display='block';window.scrollTo(0,0);},1200);
 }
 
 // === EMBEDDED MODE — activates ONLY inside index.html iframe ===
@@ -166,22 +341,26 @@ function submitRecall(){
   }
   new MutationObserver(function(){rh();setTimeout(rh,50);setTimeout(rh,150);}).observe(document.body,{childList:true,subtree:true,attributes:true});
   window.addEventListener('load',rh);setInterval(rh,300);
+  // Preloaded hidden by the survey page: report the real height as soon as it is shown.
+  window.addEventListener('message',function(e){if(e.source===window.parent&&e.data&&e.data.type==='quickrupee-show'){rh();setTimeout(rh,50);}});
   // Sync scroll-to-top with parent page
   var _st=window.scrollTo;
   window.scrollTo=function(x,y){_st.call(window,x,y);if(x===0&&y===0){window.parent.postMessage({type:'quickrupee-scroll-top'},'*');setTimeout(rh,50);setTimeout(rh,200);}};
   window.submitRecall=function(){
     var c=document.getElementById('confidenceSlider').value,a=document.getElementById('recall-apr').value.trim(),f=document.getElementById('recall-fee').value.trim();
-    if(!a||!f){alert('Please answer both recall questions before submitting.');return;}
-    var fs=document.getElementById('fairnessSlider').value,e=calcEMI(loanAmount,tenure),t=e*tenure+500;
-    var d={condition:CONDITION,loanAmountRequested:loanAmount,overborrowingAmount:loanAmount-20000,tenureSelected:tenure,insuranceAdded:insurance?'Yes':'No',emiAmount:e,totalRepayment:t,decisionConfidence:c,recallAPR:a,recallAPRCorrect:a.includes('24')?'Correct':'Incorrect',recallFee:f,recallFeeCorrect:f.includes('500')?'Correct':'Incorrect',perceivedFairness:fs};
+    if(recallMissing(a,f))return;
+    var fs=document.getElementById('fairnessSlider').value,e=calcEMI(loanAmount,tenure),tot=e*tenure+500;
+    var d={condition:CONDITION,loanAmountRequested:loanAmount,overborrowingAmount:loanAmount-20000,tenureSelected:tenure,insuranceAdded:insurance?'Yes':'No',emiAmount:e,totalRepayment:tot,decisionConfidence:c,recallAPR:a,recallAPRCorrect:normDigits(a).includes('24')?'Correct':'Incorrect',recallFee:f,recallFeeCorrect:normDigits(f).includes('500')?'Correct':'Incorrect',perceivedFairness:fs};
     window.parent.postMessage({type:'quickrupee-complete',data:d},'*');
     document.getElementById('submittedScreen').style.display='none';
     var ty=document.getElementById('thankYouScreen');ty.style.display='block';
-    ty.innerHTML='<div style="padding:40px 20px;text-align:center"><div style="font-size:44px;margin-bottom:14px">⏳</div><div style="font-size:17px;font-weight:700;color:#1a1a2e;margin-bottom:8px">Almost done!</div><div style="font-size:13px;color:#666">Loading the next section...</div></div>';
+    ty.innerHTML='<div style="padding:40px 20px;text-align:center"><div style="font-size:44px;margin-bottom:14px">⏳</div><div style="font-size:17px;font-weight:700;color:#1a1a2e;margin-bottom:8px" data-i18n="almost.title"></div><div style="font-size:13px;color:#666" data-i18n="almost.sub"></div></div>';
+    applyI18n();
     window.scrollTo(0,0);
   };
 })();
 
+applyI18n();
 updateLoan();
 </script>
 </body>
