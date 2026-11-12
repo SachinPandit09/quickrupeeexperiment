@@ -51,7 +51,6 @@ h1:focus,h2:focus{outline:none}
 .strong{color:var(--ink)!important;font-weight:600}
 .checklist{margin:8px 0 4px 1.2em;color:var(--ink)}
 .checklist li{padding:2px 0}
-.scale-key{list-style:none;margin-top:10px;color:var(--ink);font-size:15px}
 
 /* Questions */
 .q{border:0;padding:20px 0;border-top:1px solid var(--line);min-width:0}
@@ -80,8 +79,6 @@ h1:focus,h2:focus{outline:none}
 .anchors{display:flex;justify-content:space-between;gap:12px;max-width:420px;margin-top:8px;font-size:14px;line-height:1.45;color:var(--muted)}
 .anchors span{max-width:48%}
 .anchors span+span{text-align:right}
-.picked{min-height:1.6em;margin-top:6px;font-size:15px;color:var(--muted)}
-.picked.on{color:var(--ink);font-weight:600}
 
 /* Errors */
 .error-msg{margin-top:8px;font-size:15px;font-weight:600;color:var(--error)}
@@ -198,7 +195,6 @@ h1:focus,h2:focus{outline:none}
   "p6.label": "I felt calm and in control throughout the application process",
   "dc.title": "Decision Confidence",
   "dc.desc": "Please rate how much you agree with each of the following statements about your experience.",
-  "scale.key": "Scale:",
   "d1.label": "I am confident I understood the loan terms before I submitted the application",
   "d2.label": "I am satisfied with the loan amount I chose",
   "d3.label": "I felt I had enough information to make a good decision",
@@ -209,8 +205,6 @@ h1:focus,h2:focus{outline:none}
   "likert.3": "Neither agree nor disagree",
   "likert.4": "Agree",
   "likert.5": "Strongly agree",
-  "likert.hint": "Choose a number from 1 to 5",
-  "likert.picked": "Your answer: {label} ({n})",
   "dp.title": "What You Noticed",
   "dp.desc": "A few final questions about what you noticed during the application. Please answer honestly — this is not a test.",
   "x1.label": "During the application, did you notice a countdown timer or any indication that an offer was time-limited?",
@@ -322,7 +316,6 @@ h1:focus,h2:focus{outline:none}
   "p6.label": "पूरी आवेदन प्रक्रिया के दौरान मुझे सुकून रहा और लगा कि सब कुछ मेरे काबू में है",
   "dc.title": "फ़ैसले पर भरोसा",
   "dc.desc": "अपने अनुभव के बारे में नीचे लिखी हर बात से आप कितना सहमत हैं, कृपया बताएँ।",
-  "scale.key": "जवाब के विकल्प:",
   "d1.label": "मुझे भरोसा है कि आवेदन जमा करने से पहले मैंने लोन की शर्तें समझ ली थीं",
   "d2.label": "मैंने जो लोन रकम चुनी, उससे मैं संतुष्ट हूँ",
   "d3.label": "मुझे लगा कि अच्छा फ़ैसला लेने के लिए मेरे पास काफ़ी जानकारी थी",
@@ -333,8 +326,6 @@ h1:focus,h2:focus{outline:none}
   "likert.3": "न सहमत, न असहमत",
   "likert.4": "सहमत",
   "likert.5": "पूरी तरह सहमत",
-  "likert.hint": "1 से 5 में से एक नंबर चुनें",
-  "likert.picked": "आपका जवाब: {label} ({n})",
   "dp.title": "आपने क्या देखा",
   "dp.desc": "आवेदन के दौरान आपने जो देखा, उसके बारे में कुछ आख़िरी सवाल। कृपया ईमानदारी से जवाब दें — यह कोई परीक्षा नहीं है।",
   "x1.label": "आवेदन के दौरान क्या आपने कोई उलटी गिनती वाला टाइमर, या ऐसा कोई संकेत देखा कि ऑफ़र सिर्फ़ कुछ समय के लिए है?",
@@ -446,7 +437,6 @@ h1:focus,h2:focus{outline:none}
   "p6.label": "संपूर्ण अर्ज प्रक्रियेदरम्यान मला शांत वाटले आणि सर्व काही माझ्या नियंत्रणात आहे असे वाटले",
   "dc.title": "निर्णयाबद्दलचा आत्मविश्वास",
   "dc.desc": "तुमच्या अनुभवाबद्दल खालील प्रत्येक विधानाशी तुम्ही किती सहमत आहात, ते कृपया सांगा.",
-  "scale.key": "उत्तराचे पर्याय:",
   "d1.label": "अर्ज सबमिट करण्यापूर्वी मला कर्जाच्या अटी समजल्या होत्या, याची मला खात्री आहे",
   "d2.label": "मी निवडलेल्या कर्जाच्या रकमेबद्दल मी समाधानी आहे",
   "d3.label": "चांगला निर्णय घेण्यासाठी माझ्याकडे पुरेशी माहिती होती असे मला वाटले",
@@ -457,8 +447,6 @@ h1:focus,h2:focus{outline:none}
   "likert.3": "सहमतही नाही, असहमतही नाही",
   "likert.4": "सहमत",
   "likert.5": "पूर्णपणे सहमत",
-  "likert.hint": "1 ते 5 पैकी एक क्रमांक निवडा",
-  "likert.picked": "तुमचे उत्तर: {label} ({n})",
   "dp.title": "तुम्हाला काय दिसले",
   "dp.desc": "अर्ज भरताना तुम्हाला काय दिसले, याबद्दल काही शेवटचे प्रश्न. कृपया प्रामाणिकपणे उत्तर द्या — ही परीक्षा नाही.",
   "x1.label": "अर्ज भरताना तुम्हाला काउंटडाउन टायमर, किंवा ऑफर फक्त मर्यादित वेळेसाठी आहे असा कोणताही संकेत दिसला का?",
@@ -580,8 +568,7 @@ function likertQ(id) {
   LIKERT.forEach(function (v) {
     h += '<label class="pt"><input type="radio" name="' + id + '" value="' + v + '"><span class="pt-n">' + v + '</span> ' + T('likert.' + v, 'span', 'sr-only') + '</label>';
   });
-  return h + '</div><div class="anchors" dir="ltr" aria-hidden="true">' + T('likert.1') + T('likert.5') + '</div>' +
-         '<p class="picked" id="picked-' + id + '" aria-hidden="true"></p>' + errEl(id) + '</fieldset>';
+  return h + '</div><div class="anchors" dir="ltr" aria-hidden="true">' + T('likert.1') + T('likert.5') + '</div>' + errEl(id) + '</fieldset>';
 }
 function actions(back, nextAct, nextKey) {
   return '<div class="actions">' + (back ? '<button type="button" class="btn ghost" data-go="' + back + '" data-i18n="btn.back"></button>' : '') +
@@ -618,9 +605,7 @@ $('app').innerHTML =
   screen('interface', 2, '<div class="frame-wrap"><iframe id="loanFrame" data-i18n-title="frame.title"></iframe></div>') +
   screen('financial', 3, section('fl.title', T('fl.desc', 'p'), FL_IDS.map(choiceQ).join('')) + actions(null, 'toPressure', 'btn.next')) +
   screen('pressure', 4, section('pp.title', T('pp.desc', 'p'), PP_IDS.map(likertQ).join('')) + actions('financial', 'toConfidence', 'btn.next')) +
-  screen('confidence', 5, section('dc.title', T('dc.desc', 'p') +
-      '<p class="strong">' + T('scale.key') + '</p><ul class="scale-key">' +
-      LIKERT.map(function (v) { return '<li>' + v + ' = ' + T('likert.' + v) + '</li>'; }).join('') + '</ul>',
+  screen('confidence', 5, section('dc.title', T('dc.desc', 'p'),
     DC_IDS.map(likertQ).join('')) + actions('pressure', 'toDetection', 'btn.next')) +
   screen('detection', 6, section('dp.title', T('dp.desc', 'p'), DP_IDS.map(choiceQ).join('')) + actions('confidence', 'submit', 'btn.submit')) +
   statusScreen('submitting', null, T('submitting', 'p'), true) +
@@ -643,7 +628,6 @@ function applyI18n() {
   document.querySelectorAll('.error-msg[data-key]').forEach(function (el) { el.textContent = t(el.getAttribute('data-key')); });
   $('langNav').setAttribute('aria-label', t('lang.label'));
   document.querySelectorAll('#langNav button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
-  PP_IDS.concat(DC_IDS).forEach(refreshPicked);
   updateProgress();
 }
 function setLang(l) {
@@ -689,11 +673,6 @@ function getAnswer(name) {
   }
   return sel.value;
 }
-function refreshPicked(id) {
-  var p = $('picked-' + id), sel = checked(id);
-  p.textContent = sel ? t('likert.picked', { label: t('likert.' + sel.value), n: sel.value }) : t('likert.hint');
-  p.classList.toggle('on', !!sel);
-}
 function setError(id, key) {
   var card = $('card-' + id), m = $('err-' + id);
   card.classList.toggle('error', !!key);
@@ -735,7 +714,6 @@ document.addEventListener('change', function (e) {
     other.hidden = !on; other.disabled = !on;
     if (on) other.focus(); else other.value = '';
   }
-  if (/^[pd]\d$/.test(id)) refreshPicked(id);
   if ($('card-' + id).classList.contains('error') && !errorFor(id)) setError(id, null);
 });
 document.addEventListener('input', function (e) {
